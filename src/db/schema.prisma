@@ -1,0 +1,35 @@
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Source {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt   DateTime @default(now())
+  title       String
+  description String?
+  TagIds      String[] @db.ObjectId
+  tags        Tag[]    @relation(fields: [TagIds], references: [id])
+  authorIds   String[] @db.ObjectId
+  authors     Author[] @relation(fields: [authorIds], references: [id])
+}
+
+model Tag {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt DateTime @default(now())
+  name      String   @unique
+  sourceIds String[] @db.ObjectId
+  sources   Source[] @relation(fields: [sourceIds], references: [id])
+}
+
+model Author {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt DateTime @default(now())
+  name      String   @unique
+  sourceIds String[] @db.ObjectId
+  sources   Source[] @relation(fields: [sourceIds], references: [id])
+}
