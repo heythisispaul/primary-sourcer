@@ -11,6 +11,7 @@ model Source {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   createdAt   DateTime @default(now())
   title       String
+  href        String
   description String?
   TagIds      String[] @db.ObjectId
   tags        Tag[]    @relation(fields: [TagIds], references: [id])
