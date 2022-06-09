@@ -1,8 +1,8 @@
 /* eslint-disable no-unused-vars */
-import { FunctionComponent, useState } from 'react';
-import { AsyncCreatableSelect, AsyncSelect } from 'chakra-react-select';
+import { FunctionComponent, useState, useMemo } from 'react';
+import { CreatableSelect, Select } from 'chakra-react-select';
 import { useDebounce } from 'use-debounce';
-import { useQuery, useMutation, useQueryClient } from 'react-query';
+import { useQuery, useMutation } from 'react-query';
 import { Tag, Author } from '@prisma/client';
 
 export interface SelectableOption {
@@ -30,10 +30,6 @@ const RelatableToSelectable = (
   };
 });
 
-const getSkippableIds = (selections: SelectableOption[]) => (
-  JSON.stringify(selections.map(({ value }) => value))
-);
-
 // TODO: Clean up the type system here. The react-select-chakra ones are ...less than great.
 export const SearchSelect: FunctionComponent<MultiSelectInputProps> = ({
   entity,
@@ -43,23 +39,23 @@ export const SearchSelect: FunctionComponent<MultiSelectInputProps> = ({
 }) => {
   const [input, setInput] = useState('');
   const [debouncedInput] = useDebounce(input, 500);
-  const queryClient = useQueryClient();
   const searchKey = ['options', entity, debouncedInput];
   const path = `/api/relatables/${entity}?search=${debouncedInput}`;
-  const Component = allowCreate ? AsyncCreatableSelect : AsyncSelect;
+  const Component = allowCreate ? CreatableSelect : Select;
 
-  const searchResults = useQuery(searchKey, async () => {
+  const {
+    data: fetchedOptions,
+    isLoading: isSearching,
+  } = useQuery(searchKey, async () => {
     const result = await fetch(path);
     const data = await result.json();
     return data;
   });
 
-  const onAdd = (addedOption: SelectableOption) => {
-    queryClient.invalidateQueries('options');
-    onSelect(addedOption);
-  };
-
-  const { mutate, isLoading } = useMutation<Tag | Author, Error, string>(async (name) => {
+  const {
+    mutate,
+    isLoading: isMutating,
+  } = useMutation<Tag | Author, Error, string>(async (name) => {
     const result = await fetch(path, {
       method: 'POST',
       body: JSON.stringify({ name }),
@@ -69,24 +65,25 @@ export const SearchSelect: FunctionComponent<MultiSelectInputProps> = ({
   }, {
     onSuccess: (newRelatable) => {
       const [result] = RelatableToSelectable([newRelatable]);
-      queryClient.invalidateQueries('options');
       onSelect(result);
     },
   });
 
+  const options = useMemo(
+    () => RelatableToSelectable(fetchedOptions ?? [], preSelected),
+    [fetchedOptions, preSelected],
+  );
+
   return (
     <Component
+      allowCreateWhileLoading={false}
       colorScheme="orange"
+      options={options as any}
       onInputChange={(value) => setInput(value.trim())}
-      isLoading={searchResults.isLoading || isLoading}
-      loadOptions={(_, callback) => {
-        if (!searchResults.isLoading) {
-          callback(RelatableToSelectable(searchResults.data ?? [], preSelected) as any);
-        }
-      }}
+      isLoading={isSearching || isMutating}
       value={input}
       onCreateOption={(name) => mutate(name)}
-      onChange={(selected: unknown) => onAdd(selected as SelectableOption)}
+      onChange={(selected: unknown) => onSelect(selected as SelectableOption)}
     />
   );
 };
