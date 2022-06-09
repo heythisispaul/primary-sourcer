@@ -16,7 +16,8 @@ const validationWrapper = validationMiddleware({
 // TODO: Allow for updates
 const handler: SourcerNextApiHandler = async (req, res) => {
   if (req.method === 'POST') {
-    const createdAuthor = await Controller.createAuthor(req.body);
+    const parsedBody = JSON.parse(req.body);
+    const createdAuthor = await Controller.createAuthor(parsedBody);
     return res.json(createdAuthor);
   }
 

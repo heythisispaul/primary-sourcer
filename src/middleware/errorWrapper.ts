@@ -14,6 +14,7 @@ const errorHandlingMiddleware = (methods: HttpMethod[]) => (
       res.status(404);
     }
   } catch (error) {
+    console.log(error);
     res.status(500).json({
       error: true,
     });

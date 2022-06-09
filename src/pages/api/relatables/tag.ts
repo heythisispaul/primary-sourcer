@@ -16,11 +16,11 @@ const validationWrapper = validationMiddleware({
 // TODO: Allow for updates
 const handler: SourcerNextApiHandler = async (req, res) => {
   if (req.method === 'POST') {
-    const createdTag = await Controller.createTag(req.body);
+    const body = JSON.parse(req.body);
+    const createdTag = await Controller.createTag(body);
     return res.json(createdTag);
   }
 
-  console.log(req.query.search);
   const tags = await Controller.getTagOptions(req.query.search as string);
   return res.json(tags);
 };

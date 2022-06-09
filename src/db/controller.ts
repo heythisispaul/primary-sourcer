@@ -131,7 +131,7 @@ export namespace Controller {
   }
 
   // TODO: Consolidate a lot of the similar methods in here
-  export async function getAuthorOptions(searchTerm: string, limit = 25) {
+  export async function getAuthorOptions(searchTerm: string, limit = 10) {
     const authors = await client.author.findMany({
       take: limit,
       where: {
@@ -147,7 +147,7 @@ export namespace Controller {
     return authors;
   }
 
-  export async function getTagOptions(searchTerm: string, limit = 25) {
+  export async function getTagOptions(searchTerm: string, limit = 10) {
     const tags = await client.tag.findMany({
       take: limit,
       where: {
