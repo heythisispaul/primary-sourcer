@@ -2,12 +2,10 @@ import { AnyObjectSchema } from 'yup';
 import { validate } from '../validation';
 import { SourcerNextApiHandler, ValidationSelector } from './types';
 
-export interface ValidationOptionsForMethod {
-  [key: string]: {
-    schema: AnyObjectSchema;
-    selector?: ValidationSelector;
-    forceNext?: boolean;
-  }
+export type ValidationOptionsForMethod = {
+  schema: AnyObjectSchema;
+  selector?: ValidationSelector;
+  forceNext?: boolean;
 }
 
 const validateMiddleware = (
@@ -17,19 +15,23 @@ const validateMiddleware = (
     req.validationErrors = [];
   }
 
-  const validatorConfig = validationOptions[req.method ?? ''];
+  const verbsToSkip = ['GET', 'DELETE', 'OPTIONS'];
 
-  if (validatorConfig) {
-    const { selector, schema, forceNext } = validatorConfig;
-    const value = selector ? selector(req) : req.body;
-    const validationError = await validate(schema, value);
-    if (validationError && !forceNext) {
-      return res.status(400).json({
-        error: validationError,
-      });
-    }
-    req.validationErrors.push(validationError as string);
+  if (verbsToSkip.includes(req.method || '')) {
+    return wrapped(req, res);
   }
+
+  console.log('validating');
+  console.log(req.body);
+  const { selector, schema, forceNext } = validationOptions;
+  const value = selector ? selector(req) : req.body;
+  const validationError = await validate(schema, value);
+  if (validationError && !forceNext) {
+    return res.status(400).json({
+      error: validationError,
+    });
+  }
+  req.validationErrors.push(validationError as string);
   return wrapped(req, res);
 };
 

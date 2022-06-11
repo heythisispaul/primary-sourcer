@@ -1,4 +1,4 @@
-import { string, object } from 'yup';
+import { string, object, array } from 'yup';
 import { mustBeFewerThan } from './utils';
 
 export namespace Validators {
@@ -16,11 +16,13 @@ export namespace Validators {
     href: string()
       .url('Must be a valid URL')
       .required('Source is required'),
-  });
+    tagIds: array().of(string()).min(1).max(10),
+    authorIds: array().of(string()).min(1).max(10),
+  }).strict();
 
   export const authorCreate = object({
     name: string()
-      .min(5, 'Must be at least 5 characters')
+      .min(4, 'Must be at least 4 characters')
       .max(...mustBeFewerThan(100))
       .required('Name is required'),
   });

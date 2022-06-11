@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { UseFormSetValue } from 'react-hook-form';
+import { SourceWithRelations } from '../../db';
 import { SelectableOption } from '../components/common/SearchSelect';
 
 export interface CreateSourceFormData {
@@ -10,9 +11,24 @@ export interface CreateSourceFormData {
   authorIds: string[];
 }
 
-export const useCreateSourceControls = (formUpdater: UseFormSetValue<CreateSourceFormData>) => {
-  const [tags, setTags] = useState<SelectableOption[]>([]);
-  const [authors, setAuthors] = useState<SelectableOption[]>([]);
+const relatableToSource = (items?: {id: string, name: string}[]): SelectableOption[] => {
+  if (!items) {
+    return [];
+  }
+
+  return items.map(({ id, name }) => ({ value: id, label: name }));
+};
+
+export const useCreateSourceControls = (
+  formUpdater: UseFormSetValue<CreateSourceFormData>,
+  sourceToEdit?: SourceWithRelations,
+) => {
+  const [tags, setTags] = useState<SelectableOption[]>(
+    relatableToSource(sourceToEdit?.tags),
+  );
+  const [authors, setAuthors] = useState<SelectableOption[]>(
+    relatableToSource(sourceToEdit?.authors),
+  );
 
   const onTagSelect = useCallback((tag: SelectableOption) => {
     setTags((currentTags) => [...currentTags, tag]);

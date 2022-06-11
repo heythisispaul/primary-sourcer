@@ -11,9 +11,9 @@ export enum SortKey {
 export interface SourceSearchParameters {
   offset?: number;
   searchTerm?: string;
-  tags?: Tag['id'][]
+  tags?: Tag['id'][];
   authors?: Author['id'][];
-  sortKey: SortKey;
+  sortKey?: SortKey;
 }
 
 export type SourceWithRelations = Source & {

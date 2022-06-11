@@ -13,8 +13,8 @@ model Source {
   title       String
   href        String
   description String?
-  TagIds      String[] @db.ObjectId
-  tags        Tag[]    @relation(fields: [TagIds], references: [id])
+  tagIds      String[] @db.ObjectId
+  tags        Tag[]    @relation(fields: [tagIds], references: [id])
   authorIds   String[] @db.ObjectId
   authors     Author[] @relation(fields: [authorIds], references: [id])
 }

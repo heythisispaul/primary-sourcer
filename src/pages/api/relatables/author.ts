@@ -6,18 +6,15 @@ import {
 import { Validators } from '../../../validation';
 import { Controller } from '../../../db';
 
-const errorWrapper = errorHandlingMiddleware(['GET', 'POST']);
+const errorWrapper = errorHandlingMiddleware(['GET', 'POST', 'PATCH']);
 const validationWrapper = validationMiddleware({
-  POST: {
-    schema: Validators.authorCreate,
-  },
+  schema: Validators.authorCreate,
 });
 
 // TODO: Allow for updates
 const handler: SourcerNextApiHandler = async (req, res) => {
   if (req.method === 'POST') {
-    const parsedBody = JSON.parse(req.body);
-    const createdAuthor = await Controller.createAuthor(parsedBody);
+    const createdAuthor = await Controller.createAuthor(req.body);
     return res.json(createdAuthor);
   }
 

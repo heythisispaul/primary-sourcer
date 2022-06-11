@@ -1,9 +1,12 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import { FunctionComponent } from 'react';
 import {
-  HStack,
+  Flex,
+  FlexProps,
   Tag,
   TagLabel,
   TagCloseButton,
+  TagProps,
 } from '@chakra-ui/react';
 
 // This is lazy, but it can either take in a relatable data model
@@ -18,27 +21,31 @@ export interface TagContainerProps {
   isEditing: boolean;
   // eslint-disable-next-line no-unused-vars
   onDelete: (id: string) => void;
+  tagProps?: TagProps;
 }
 
-export const TagContainer: FunctionComponent<TagContainerProps> = ({
+export const TagContainer: FunctionComponent<TagContainerProps & FlexProps> = ({
   items,
   isEditing,
   onDelete,
+  tagProps = {},
+  ...rest // FlexProps
 }) => (
-  <HStack align="baseline" spacing={2}>
+  <Flex {...rest} direction="row" align="baseline" flexWrap="wrap" alignContent="space-around">
     {
       items.map(({
         label, value, name, id,
       }) => (
         <Tag
-          key={value}
+          key={value || id}
           borderRadius="full"
-          colorScheme="orange"
+          m={1}
+          {...tagProps}
         >
           <TagLabel>{label || name}</TagLabel>
           {isEditing && <TagCloseButton onClick={() => onDelete(value || id as string)} />}
         </Tag>
       ))
     }
-  </HStack>
+  </Flex>
 );

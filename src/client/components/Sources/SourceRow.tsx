@@ -1,14 +1,16 @@
-import { FunctionComponent, useState, useRef } from 'react';
+import { FunctionComponent } from 'react';
 import {
-  Box,
   Collapse,
-  Heading,
   Text,
   Flex,
+  Link,
+  useMediaQuery,
 } from '@chakra-ui/react';
-import { TagBadge } from './TagBadge';
 import { SourceContextMenu } from './SourceContextMenu';
+import { TagContainer } from '../common/TagContainer';
 import { SourceWithRelations } from '../../../db';
+import { toUSDate, toURL } from '../../utils';
+import { useEditingSourceControls } from '../../hooks';
 
 export interface SourceRowProps {
   activeId: string;
@@ -20,41 +22,79 @@ export interface SourceRowProps {
 export const SourceRow: FunctionComponent<SourceRowProps> = ({
   activeId,
   setActiveId,
-  source: {
+  source,
+}) => {
+  const {
     id,
     title,
+    href,
+    authors,
     tags,
     description,
-  },
-}) => {
-  const [isInEditMode, setIsInEditMode] = useState(false);
-  const { current: setIsEditing } = useRef(() => setIsInEditMode(true));
-  const isExpanded = Boolean((activeId === id) && description);
+    createdAt,
+  } = source;
+  const { setSourceToEdit, sourceToEdit } = useEditingSourceControls();
+  const isInEditMode = Boolean(sourceToEdit);
+  const [isDesktop] = useMediaQuery('(min-width: 600px)');
+  const isExpanded = Boolean((activeId === id));
+  const { host } = toURL(href);
+
+  const sourceAndAuthors = (
+    <Flex align="baseline">
+      <Text ml={2} fontSize=".8em" color="gray.400">by</Text>
+      <TagContainer
+        items={authors}
+        isEditing={false}
+        onDelete={() => {}}
+        tagProps={{ colorScheme: 'gray', size: 'sm' }}
+      />
+      <Text fontSize=".8em" color="gray.400" mb={2} pl={1}>
+        {`${host}`}
+      </Text>
+    </Flex>
+  );
 
   return (
-    <Box onClick={() => setActiveId(id)}>
-      <SourceContextMenu isInEditMode={isInEditMode} setIsInEditMode={setIsEditing} />
-      <Flex align="baseline">
-        <Heading size="md">{title}</Heading>
-        {
-          tags.map((tag) => (
-            <TagBadge
-              tag={tag}
-              isEditMode={isInEditMode}
-              // TODO: add this to an array of ids to delete on 'Save' click.
-              onTagRemove={(tagId) => console.log(tagId)}
-            />
-          ))
-        }
+    <Flex
+      onClick={() => setActiveId(isExpanded ? '' : id)}
+      w="100%"
+      p={2}
+      border="1px"
+      borderColor="gray.300"
+      borderRadius="8px"
+      flexDirection="column"
+      bg="white"
+      _hover={{ cursor: 'pointer' }}
+    >
+      <Flex align="baseline" w="100%" justifyContent="space-between" p={1}>
+        <Flex justifyContent="center" align="baseline" paddingBottom="0px">
+          <Link isExternal href={href} fontSize="1.2em" fontWeight="bold">
+            {title}
+          </Link>
+          {isDesktop && sourceAndAuthors}
+
+        </Flex>
+        <SourceContextMenu
+          isInEditMode={isInEditMode}
+          onEdit={() => setSourceToEdit(source)}
+          onDelete={() => {}}
+        />
       </Flex>
+      {!isDesktop && sourceAndAuthors}
+      <TagContainer
+        items={tags}
+        onDelete={() => {}}
+        isEditing={false}
+        tagProps={{ colorScheme: 'orange' }}
+      />
       <Collapse in={isExpanded}>
-        <Text>
+        <Text pl={1}>
           {description}
         </Text>
+        <Text fontSize=".8em" color="gray.400" mt={2}>
+          {`Created ${toUSDate(createdAt)}`}
+        </Text>
       </Collapse>
-      <Collapse in={isInEditMode}>
-        <Text>Save and undo buttons go here</Text>
-      </Collapse>
-    </Box>
+    </Flex>
   );
 };

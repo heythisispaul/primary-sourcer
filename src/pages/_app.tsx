@@ -5,9 +5,8 @@ import { NextPage } from 'next';
 import type { AppProps } from 'next/app';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import theme from '../client/theme';
-import '../styles/globals.css';
 
-export type NextPageWithLayout = NextPage & {
+export type NextPageWithLayout<T = any> = NextPage<T> & {
   // eslint-disable-next-line no-unused-vars
   getLayout?: (page: ReactElement) => ReactNode
 }

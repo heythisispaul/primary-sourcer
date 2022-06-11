@@ -1,25 +1,25 @@
 import {
-  SourcerNextApiHandler,
   errorHandlingMiddleware,
   validationMiddleware,
+  SourcerNextApiHandler,
 } from '../../../middleware';
 import { Validators } from '../../../validation';
 import { Controller } from '../../../db';
 
-const errorWrapper = errorHandlingMiddleware(['GET', 'POST']);
+const errorWrapper = errorHandlingMiddleware(['POST', 'GET']);
 const validationWrapper = validationMiddleware({
-  schema: Validators.tagCreate,
+  schema: Validators.sourceCreate,
 });
 
-// TODO: Allow for updates
 const handler: SourcerNextApiHandler = async (req, res) => {
   if (req.method === 'POST') {
-    const createdTag = await Controller.createTag(req.body);
-    return res.json(createdTag);
+    const createdSource = await Controller.createSource(req.body);
+    return res.json(createdSource);
   }
 
-  const tags = await Controller.getTagOptions(req.query.search as string);
-  return res.json(tags);
+  console.log(req.query);
+  const sources = await Controller.getPageOfSources({});
+  return res.json(sources);
 };
 
 export default errorWrapper(validationWrapper(handler));

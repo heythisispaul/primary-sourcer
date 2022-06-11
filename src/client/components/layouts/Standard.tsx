@@ -2,13 +2,18 @@ import {
   FunctionComponent, ReactNode, ReactElement,
 } from 'react';
 import Head from 'next/head';
-import { Flex, Box } from '@chakra-ui/react';
+import { Flex } from '@chakra-ui/react';
 import Header from '../Header';
+import Footer from '../Footer';
 
 export interface LayoutProps {
   title?: string;
   children?: ReactNode;
 }
+
+const HEADER_HEIGHT = 56;
+const FOOTER_HEIGHT = 60;
+const delta = HEADER_HEIGHT + FOOTER_HEIGHT + 15;
 
 export const StandardLayout: FunctionComponent<LayoutProps> = ({
   children,
@@ -19,11 +24,18 @@ export const StandardLayout: FunctionComponent<LayoutProps> = ({
       <title>{title}</title>
     </Head>
     <Header />
-    <Flex justifyContent="center">
-      <Box id="layout-container" w="100%" maxW="1920px" as="main">
+    <Flex justifyContent="center" minH={`calc(100vh - ${delta}px)`}>
+      <Flex
+        id="layout-container"
+        w="100%"
+        maxW="1200px"
+        as="main"
+        justifyContent="center"
+      >
         {children}
-      </Box>
+      </Flex>
     </Flex>
+    <Footer />
   </>
 );
 

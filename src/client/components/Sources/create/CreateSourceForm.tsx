@@ -7,21 +7,24 @@ import {
 } from '@chakra-ui/react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { AppFormControl } from '../common/AppFormControl';
-import { SearchSelect } from '../common/SearchSelect';
-import { TagContainer } from '../common/TagContainer';
-import { useCreateSourceControls, CreateSourceFormData } from '../../hooks';
-import { Validators } from '../../../validation';
+import { AppFormControl } from '../../common/AppFormControl';
+import { SearchSelect } from '../../common/SearchSelect';
+import { TagContainer } from '../../common/TagContainer';
+import { useCreateSourceControls, CreateSourceFormData } from '../../../hooks';
+import { Validators } from '../../../../validation';
+import { SourceWithRelations } from '../../../../db';
 
 export interface CreateSourceFormProps {
   // eslint-disable-next-line no-unused-vars
   onSubmit: (data: CreateSourceFormData) => void | Promise<void>;
   children: ReactNode;
+  sourceToEdit?: SourceWithRelations;
 }
 
 export const CreateSourceForm: FunctionComponent<CreateSourceFormProps> = ({
   onSubmit,
   children,
+  sourceToEdit,
 }) => {
   const {
     register,
@@ -30,6 +33,7 @@ export const CreateSourceForm: FunctionComponent<CreateSourceFormProps> = ({
     formState: { errors },
   } = useForm<CreateSourceFormData>({
     resolver: yupResolver(Validators.sourceCreate),
+    defaultValues: { ...sourceToEdit, description: sourceToEdit?.description ?? '' },
   });
 
   const {
@@ -39,7 +43,7 @@ export const CreateSourceForm: FunctionComponent<CreateSourceFormProps> = ({
     onAuthorSelect,
     removeTag,
     removeAuthor,
-  } = useCreateSourceControls(setValue);
+  } = useCreateSourceControls(setValue, sourceToEdit);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -56,10 +60,10 @@ export const CreateSourceForm: FunctionComponent<CreateSourceFormProps> = ({
         >
           <Input {...register('href')} />
         </AppFormControl>
-        <TagContainer items={authors} isEditing onDelete={removeAuthor} />
+        <TagContainer items={authors} isEditing onDelete={removeAuthor} tagProps={{ colorScheme: 'blue' }} mb={2} />
         <AppFormControl
           label="Author(s)"
-          errorMessage={errors?.authorIds && 'One or more authors are not able to be added'}
+          errorMessage={errors?.authorIds && 'There was an error with your Author selections'}
         >
           <SearchSelect
             entity="author"
@@ -74,10 +78,10 @@ export const CreateSourceForm: FunctionComponent<CreateSourceFormProps> = ({
         >
           <Textarea {...register('description')} />
         </AppFormControl>
-        <TagContainer items={tags} isEditing onDelete={removeTag} />
+        <TagContainer items={tags} isEditing onDelete={removeTag} mb={2} tagProps={{ colorScheme: 'orange' }} />
         <AppFormControl
           label="Tags"
-          errorMessage={errors?.tagIds && 'One or more tags are not able to be added'}
+          errorMessage={errors?.tagIds && 'There was an error with your tag selections'}
         >
           <SearchSelect
             entity="tag"

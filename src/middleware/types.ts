@@ -9,3 +9,10 @@ export type SourcerNextApiHandler<T = unknown> = (
   req: SourcerApiRequest,
   res: NextApiResponse<T>
 ) => unknown | Promise<unknown>;
+
+// eslint-disable-next-line no-shadow
+export enum HttpMethod {
+  GET = 'GET',
+  POST = 'POST',
+  PATCH = 'PATCH'
+}
