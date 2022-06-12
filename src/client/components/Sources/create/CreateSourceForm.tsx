@@ -4,15 +4,21 @@ import {
   Input,
   Flex,
   Textarea,
+  Switch,
+  Collapse,
+  Button,
 } from '@chakra-ui/react';
+import { ArrowDownIcon, ArrowUpIcon } from '@chakra-ui/icons';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { AppFormControl } from '../../common/AppFormControl';
 import { SearchSelect } from '../../common/SearchSelect';
 import { TagContainer } from '../../common/TagContainer';
+import { YearInput } from './YearInput';
 import { useCreateSourceControls, CreateSourceFormData } from '../../../hooks';
 import { Validators } from '../../../../validation';
 import { SourceWithRelations } from '../../../../db';
+import { thisYear } from '../../../utils';
 
 export interface CreateSourceFormProps {
   // eslint-disable-next-line no-unused-vars
@@ -30,10 +36,16 @@ export const CreateSourceForm: FunctionComponent<CreateSourceFormProps> = ({
     register,
     handleSubmit,
     setValue,
+    watch,
     formState: { errors },
   } = useForm<CreateSourceFormData>({
     resolver: yupResolver(Validators.sourceCreate),
-    defaultValues: { ...sourceToEdit, description: sourceToEdit?.description ?? '' },
+    defaultValues: {
+      ...sourceToEdit,
+      description: sourceToEdit?.description ?? '',
+      yearStart: sourceToEdit?.yearStart ?? undefined,
+      yearEnd: sourceToEdit?.yearEnd ?? undefined,
+    },
   });
 
   const {
@@ -43,6 +55,10 @@ export const CreateSourceForm: FunctionComponent<CreateSourceFormProps> = ({
     onAuthorSelect,
     removeTag,
     removeAuthor,
+    hasYears,
+    toggleHasYears,
+    hasRange,
+    toggleHasRange,
   } = useCreateSourceControls(setValue, sourceToEdit);
 
   return (
@@ -63,7 +79,7 @@ export const CreateSourceForm: FunctionComponent<CreateSourceFormProps> = ({
         <TagContainer items={authors} isEditing onDelete={removeAuthor} tagProps={{ colorScheme: 'blue' }} mb={2} />
         <AppFormControl
           label="Author(s)"
-          errorMessage={errors?.authorIds && 'There was an error with your Author selections'}
+          errorMessage={errors?.authorIds && 'There was an error with your author selections'}
         >
           <SearchSelect
             entity="author"
@@ -90,6 +106,39 @@ export const CreateSourceForm: FunctionComponent<CreateSourceFormProps> = ({
             preSelected={tags}
           />
         </AppFormControl>
+        <AppFormControl label="Has Relevant Years" mt={2} errorMessage={errors?.yearType?.message}>
+          <Switch isChecked={hasYears} onChange={toggleHasYears} ml={2} colorScheme="orange" />
+        </AppFormControl>
+        <Collapse in={hasYears}>
+          <Flex direction="column">
+            <AppFormControl
+              label={hasRange ? 'Year (from)' : 'Relevant Year'}
+              errorMessage={errors?.yearStart?.message}
+            >
+              <YearInput
+                onChange={(value) => setValue('yearStart', value)}
+                initialValue={watch('yearStart') ?? thisYear}
+              />
+            </AppFormControl>
+            <Collapse in={hasRange}>
+              <AppFormControl label="Year (to)" errorMessage={errors?.yearEnd?.message}>
+                <YearInput
+                  onChange={(value) => setValue('yearEnd', value)}
+                  initialValue={watch('yearEnd') ?? thisYear}
+                />
+              </AppFormControl>
+            </Collapse>
+            <Button
+              onClick={toggleHasRange}
+              colorScheme="orange"
+              variant="ghost"
+              rightIcon={hasRange ? <ArrowUpIcon /> : <ArrowDownIcon />}
+              mt={3}
+            >
+              {hasRange ? 'Single year' : 'Use range'}
+            </Button>
+          </Flex>
+        </Collapse>
       </Flex>
       {children}
     </form>

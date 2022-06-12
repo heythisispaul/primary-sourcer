@@ -1,4 +1,11 @@
-import { string, object, array } from 'yup';
+/* eslint-disable consistent-return */
+import {
+  string,
+  object,
+  array,
+  number,
+  NumberSchema,
+} from 'yup';
 import { mustBeFewerThan } from './utils';
 
 export namespace Validators {
@@ -18,6 +25,16 @@ export namespace Validators {
       .required('Source is required'),
     tagIds: array().of(string()).min(1).max(10),
     authorIds: array().of(string()).min(1).max(10),
+    yearType: string().oneOf(['NONE', 'POINT', 'RANGE']),
+    yearStart: number().min(-10000),
+    // @ts-ignore
+    yearEnd: number().when(['yearType', 'yearStart'], (yearType: string, yearStart: number, schema: NumberSchema) => {
+      schema.max(2500);
+      if (yearType === 'RANGE') {
+        return schema.min(yearStart, 'Must be greater than year end range');
+      }
+      return schema;
+    }),
   }).strict();
 
   export const authorCreate = object({

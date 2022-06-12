@@ -33,6 +33,9 @@ export namespace Controller {
         authorIds: data.authorIds,
         title: data.title,
         href: data.href,
+        yearType: data.yearType,
+        yearStart: data.yearStart,
+        yearEnd: data.yearEnd,
       },
     });
     return updatedSource;

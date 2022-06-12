@@ -1,4 +1,4 @@
-import { FunctionComponent } from 'react';
+import { FunctionComponent, useMemo } from 'react';
 import {
   Collapse,
   Text,
@@ -32,12 +32,28 @@ export const SourceRow: FunctionComponent<SourceRowProps> = ({
     tags,
     description,
     createdAt,
+    yearStart,
+    yearEnd,
+    yearType,
   } = source;
   const { setSourceToEdit, sourceToEdit } = useEditingSourceControls();
   const isInEditMode = Boolean(sourceToEdit);
   const [isDesktop] = useMediaQuery('(min-width: 600px)');
   const isExpanded = Boolean((activeId === id));
   const { host } = toURL(href);
+
+  const timeFrameDisplay = useMemo(() => {
+    const eraDisplay = (year: number | null) => `${Math.abs(year ?? 1)} ${(year ?? 1) > 0 ? 'AD' : 'BC'}`;
+    if (yearType === 'NONE') {
+      return null;
+    }
+
+    if (yearType === 'POINT') {
+      return `(${eraDisplay(yearStart)})`;
+    }
+
+    return `(${eraDisplay(yearStart)} - ${eraDisplay(yearEnd)})`;
+  }, [yearType, yearStart, yearEnd]);
 
   const sourceAndAuthors = (
     <Flex align="baseline">
@@ -49,7 +65,10 @@ export const SourceRow: FunctionComponent<SourceRowProps> = ({
         tagProps={{ colorScheme: 'gray', size: 'sm' }}
       />
       <Text fontSize=".8em" color="gray.400" mb={2} pl={1}>
-        {`${host}`}
+        {timeFrameDisplay}
+      </Text>
+      <Text fontSize=".8em" color="gray.400" mb={2} pl={1}>
+        {host}
       </Text>
     </Flex>
   );
@@ -72,7 +91,6 @@ export const SourceRow: FunctionComponent<SourceRowProps> = ({
             {title}
           </Link>
           {isDesktop && sourceAndAuthors}
-
         </Flex>
         <SourceContextMenu
           isInEditMode={isInEditMode}

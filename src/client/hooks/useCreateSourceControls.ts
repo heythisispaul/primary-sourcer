@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { UseFormSetValue } from 'react-hook-form';
+import { Source } from '@prisma/client';
 import { SourceWithRelations } from '../../db';
 import { SelectableOption } from '../components/common/SearchSelect';
 
@@ -9,6 +10,9 @@ export interface CreateSourceFormData {
   description?: string;
   tagIds: string[];
   authorIds: string[];
+  yearType: Source['yearType'];
+  yearStart?: number;
+  yearEnd?: number;
 }
 
 const relatableToSource = (items?: {id: string, name: string}[]): SelectableOption[] => {
@@ -30,6 +34,9 @@ export const useCreateSourceControls = (
     relatableToSource(sourceToEdit?.authors),
   );
 
+  const [hasYears, setHasYears] = useState(sourceToEdit?.yearType !== 'NONE' ?? true);
+  const [hasRange, setHasRange] = useState(sourceToEdit?.yearType === 'RANGE' ?? false);
+
   const onTagSelect = useCallback((tag: SelectableOption) => {
     setTags((currentTags) => [...currentTags, tag]);
   }, []);
@@ -46,6 +53,14 @@ export const useCreateSourceControls = (
     setAuthors((currentAuthors) => currentAuthors.filter(({ value }) => value !== id));
   }, []);
 
+  const toggleHasYears = useCallback(() => {
+    setHasYears((currentHasYears) => !currentHasYears);
+  }, []);
+
+  const toggleHasRange = useCallback(() => {
+    setHasRange((currentHasRange) => !currentHasRange);
+  }, []);
+
   useEffect(() => {
     const tagIds = tags.map(({ value }) => value);
     formUpdater('tagIds', tagIds);
@@ -56,6 +71,17 @@ export const useCreateSourceControls = (
     formUpdater('authorIds', authorIds);
   }, [authors, formUpdater]);
 
+  useEffect(() => {
+    if (!hasYears) {
+      formUpdater('yearType', 'NONE');
+    } else {
+      formUpdater(
+        'yearType',
+        hasRange ? 'RANGE' : 'POINT',
+      );
+    }
+  }, [hasYears, hasRange, formUpdater]);
+
   return {
     tags,
     onTagSelect,
@@ -63,5 +89,9 @@ export const useCreateSourceControls = (
     authors,
     onAuthorSelect,
     removeAuthor,
+    hasYears,
+    toggleHasYears,
+    hasRange,
+    toggleHasRange,
   };
 };

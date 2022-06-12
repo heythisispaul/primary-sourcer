@@ -29,7 +29,7 @@ import EditingSource from '../../../contexts/EditingSource';
 import { CreateSourceFormData, useFetchClient } from '../../../hooks';
 import { SourceWithRelations } from '../../../../db';
 
-export const CreateSourceButton: FunctionComponent<{ children: ReactNode}> = ({
+export const CreateSourceButton: FunctionComponent<{ children: ReactNode }> = ({
   children,
 }) => {
   const { isOpen, onClose, onOpen } = useDisclosure();
@@ -98,7 +98,7 @@ export const CreateSourceButton: FunctionComponent<{ children: ReactNode}> = ({
       <Drawer isOpen={isOpen} onClose={onClose} size="md" onCloseComplete={() => setSourceToEdit(undefined)}>
         <DrawerOverlay />
         <DrawerContent p={6}>
-          <DrawerHeader>New Primary Source</DrawerHeader>
+          <DrawerHeader>{sourceToEdit ? 'Edit Source' : 'New Source'}</DrawerHeader>
           <DrawerCloseButton />
           <CreateSourceForm onSubmit={mutate} sourceToEdit={sourceToEdit}>
             <DrawerFooter p={4}>
@@ -106,14 +106,14 @@ export const CreateSourceButton: FunctionComponent<{ children: ReactNode}> = ({
                 <Button
                   onClick={onClose}
                   variant="outline"
-                  isLoading={isLoading}
+                  isDisabled={isLoading}
                 >
                   Cancel
                 </Button>
                 <Button
                   type="submit"
                   colorScheme="orange"
-                  disabled={isLoading}
+                  isLoading={isLoading}
                 >
                   {sourceToEdit ? 'Update' : 'Create'}
                 </Button>

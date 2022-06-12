@@ -21,3 +21,10 @@ export const toURL = (urlString: string) => {
   const isSafe = SAFE_HOSTS.includes(host);
   return { href, host, isSafe };
 };
+
+export const getThisYear = () => {
+  const today = new Date();
+  return today.getFullYear();
+};
+
+export const thisYear = getThisYear();

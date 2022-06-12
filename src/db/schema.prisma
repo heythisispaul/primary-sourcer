@@ -7,6 +7,12 @@ generator client {
   provider = "prisma-client-js"
 }
 
+enum yearType {
+  NONE
+  RANGE
+  POINT
+}
+
 model Source {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   createdAt   DateTime @default(now())
@@ -17,6 +23,9 @@ model Source {
   tags        Tag[]    @relation(fields: [tagIds], references: [id])
   authorIds   String[] @db.ObjectId
   authors     Author[] @relation(fields: [authorIds], references: [id])
+  yearType    yearType?
+  yearStart   Int?
+  yearEnd     Int?
 }
 
 model Tag {
