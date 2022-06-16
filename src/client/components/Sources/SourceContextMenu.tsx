@@ -20,6 +20,7 @@ export const SourceContextMenu: FunctionComponent<SourceContextMenuProps> = ({
   onDelete,
 }) => {
   const onClickWrapper = (on: () => void) => (e: SyntheticEvent) => {
+    e.stopPropagation();
     e.preventDefault();
     on();
   };

@@ -1,4 +1,9 @@
-import { Source, Author, Tag } from '@prisma/client';
+import {
+  Source,
+  Author,
+  Tag,
+  Region,
+} from '@prisma/client';
 import client from './client';
 import {
   CreateInput,
@@ -31,6 +36,7 @@ export namespace Controller {
         description: data.description,
         tagIds: data.tagIds,
         authorIds: data.authorIds,
+        regionIds: data.regionIds,
         title: data.title,
         href: data.href,
         yearType: data.yearType,
@@ -72,6 +78,12 @@ export namespace Controller {
           },
         },
         tags: {
+          select: {
+            name: true,
+            id: true,
+          },
+        },
+        regions: {
           select: {
             name: true,
             id: true,
@@ -181,6 +193,64 @@ export namespace Controller {
   // TODO: Consolidate a lot of the similar methods in here
   export async function getAuthorOptions(searchTerm: string, limit = 10) {
     const authors = await client.author.findMany({
+      take: limit,
+      where: {
+        name: { contains: searchTerm, mode: 'insensitive' },
+      },
+      select: {
+        name: true,
+        id: true,
+        createdAt: true,
+      },
+    });
+
+    return authors;
+  }
+
+  // REGIONS
+  export async function createRegion(data: CreateInput<Region>) {
+    const newAuthor = await client.region.create({ data });
+    return newAuthor;
+  }
+
+  export async function addRegionToSource(sourceId: string, regionId: string) {
+    const updatedSource = await client.source.update({
+      where: { id: sourceId },
+      data: {
+        regionIds: {
+          push: regionId,
+        },
+      },
+    });
+
+    return updatedSource;
+  }
+
+  // There is no remove from list function in Prisma :(
+  export async function removeRegionsFromSource(sourceId: string, regionIds: string | string[]) {
+    const regionsToRemove = [regionIds].flat();
+    const sourceToUpdate = await client.source.findUnique({ where: { id: sourceId } });
+    const updatedRegionList = sourceToUpdate?.tagIds
+      .filter((tag) => !regionsToRemove.includes(tag));
+    if (updatedRegionList) {
+      const updatedSource = await client.source.update({
+        where: { id: sourceId },
+        data: {
+          regionIds: {
+            set: updatedRegionList,
+          },
+        },
+      });
+
+      return updatedSource;
+    }
+
+    return sourceToUpdate;
+  }
+
+  // TODO: Consolidate a lot of the similar methods in here
+  export async function getRegionOptions(searchTerm: string, limit = 10) {
+    const authors = await client.region.findMany({
       take: limit,
       where: {
         name: { contains: searchTerm, mode: 'insensitive' },

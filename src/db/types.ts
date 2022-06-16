@@ -1,5 +1,10 @@
 /* eslint-disable no-unused-vars */
-import { Tag, Author, Source } from '@prisma/client';
+import {
+  Tag,
+  Author,
+  Source,
+  Region,
+} from '@prisma/client';
 
 export type CreateInput<T> = Omit<T, 'createdAt' | 'id'>;
 
@@ -19,4 +24,5 @@ export interface SourceSearchParameters {
 export type SourceWithRelations = Source & {
   tags: Pick<Tag, 'id' | 'name'>[],
   authors: Pick<Author, 'id' | 'name'>[]
+  regions: Pick<Region, 'id' | 'name'>[]
 };

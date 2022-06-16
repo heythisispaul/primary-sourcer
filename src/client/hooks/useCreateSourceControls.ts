@@ -10,6 +10,7 @@ export interface CreateSourceFormData {
   description?: string;
   tagIds: string[];
   authorIds: string[];
+  regionIds: string[];
   yearType: Source['yearType'];
   yearStart?: number;
   yearEnd?: number;
@@ -33,6 +34,9 @@ export const useCreateSourceControls = (
   const [authors, setAuthors] = useState<SelectableOption[]>(
     relatableToSource(sourceToEdit?.authors),
   );
+  const [regions, setRegions] = useState<SelectableOption[]>(
+    relatableToSource(sourceToEdit?.regions),
+  );
 
   const [hasYears, setHasYears] = useState(sourceToEdit?.yearType !== 'NONE' ?? true);
   const [hasRange, setHasRange] = useState(sourceToEdit?.yearType === 'RANGE' ?? false);
@@ -45,12 +49,20 @@ export const useCreateSourceControls = (
     setAuthors((currentAuthors) => [...currentAuthors, author]);
   }, []);
 
+  const onRegionSelect = useCallback((region: SelectableOption) => {
+    setRegions((currentRegions) => [...currentRegions, region]);
+  }, []);
+
   const removeTag = useCallback((id: string) => {
     setTags((currentTags) => currentTags.filter(({ value }) => value !== id));
   }, []);
 
   const removeAuthor = useCallback((id: string) => {
     setAuthors((currentAuthors) => currentAuthors.filter(({ value }) => value !== id));
+  }, []);
+
+  const removeRegion = useCallback((id: string) => {
+    setRegions((currentRegions) => currentRegions.filter(({ value }) => value !== id));
   }, []);
 
   const toggleHasYears = useCallback(() => {
@@ -72,6 +84,11 @@ export const useCreateSourceControls = (
   }, [authors, formUpdater]);
 
   useEffect(() => {
+    const regionIds = regions.map(({ value }) => value);
+    formUpdater('regionIds', regionIds);
+  }, [regions, formUpdater]);
+
+  useEffect(() => {
     if (!hasYears) {
       formUpdater('yearType', 'NONE');
     } else {
@@ -89,6 +106,9 @@ export const useCreateSourceControls = (
     authors,
     onAuthorSelect,
     removeAuthor,
+    regions,
+    onRegionSelect,
+    removeRegion,
     hasYears,
     toggleHasYears,
     hasRange,

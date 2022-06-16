@@ -23,11 +23,11 @@ export const YearInput: FunctionComponent<YearInputProps> = ({
   const initialEra: Era = initialValue < 0 ? 'BC' : 'AD';
   const [era, setEra] = useState<Era | string>(initialEra);
   const [yearValue, setYearValue] = useState<number>(Math.abs(initialValue));
-  const coEfficient = era === 'AD' ? 1 : -1;
 
   useEffect(() => {
+    const coEfficient = era === 'AD' ? 1 : -1;
     onChange(yearValue * coEfficient);
-  }, [yearValue, coEfficient]);
+  }, [yearValue, era]);
 
   return (
     <Flex justifyContent="" gap={5} alignItems="center">

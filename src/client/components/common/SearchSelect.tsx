@@ -12,7 +12,7 @@ export interface SelectableOption {
 }
 
 export interface MultiSelectInputProps {
-  entity: 'author' | 'tag';
+  entity: 'author' | 'tag' | 'region';
   onSelect: (option: SelectableOption) => void;
   allowCreate?: boolean;
   preSelected?: SelectableOption[];

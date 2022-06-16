@@ -51,10 +51,13 @@ export const CreateSourceForm: FunctionComponent<CreateSourceFormProps> = ({
   const {
     tags,
     authors,
+    regions,
     onTagSelect,
     onAuthorSelect,
+    onRegionSelect,
     removeTag,
     removeAuthor,
+    removeRegion,
     hasYears,
     toggleHasYears,
     hasRange,
@@ -93,6 +96,18 @@ export const CreateSourceForm: FunctionComponent<CreateSourceFormProps> = ({
           errorMessage={errors?.description?.message}
         >
           <Textarea {...register('description')} />
+        </AppFormControl>
+        <TagContainer items={regions} isEditing onDelete={removeRegion} mb={2} tagProps={{ colorScheme: 'red' }} />
+        <AppFormControl
+          label="Regions"
+          errorMessage={errors?.regionIds && 'There was an error with your region selections'}
+        >
+          <SearchSelect
+            entity="region"
+            allowCreate
+            onSelect={onRegionSelect}
+            preSelected={regions}
+          />
         </AppFormControl>
         <TagContainer items={tags} isEditing onDelete={removeTag} mb={2} tagProps={{ colorScheme: 'orange' }} />
         <AppFormControl

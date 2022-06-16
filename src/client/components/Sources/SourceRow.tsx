@@ -30,6 +30,7 @@ export const SourceRow: FunctionComponent<SourceRowProps> = ({
     href,
     authors,
     tags,
+    regions,
     description,
     createdAt,
     yearStart,
@@ -100,12 +101,18 @@ export const SourceRow: FunctionComponent<SourceRowProps> = ({
       </Flex>
       {!isDesktop && sourceAndAuthors}
       <TagContainer
-        items={tags}
+        items={regions}
         onDelete={() => {}}
         isEditing={false}
-        tagProps={{ colorScheme: 'orange' }}
+        tagProps={{ colorScheme: 'red' }}
       />
       <Collapse in={isExpanded}>
+        <TagContainer
+          items={tags}
+          onDelete={() => {}}
+          isEditing={false}
+          tagProps={{ colorScheme: 'orange' }}
+        />
         <Text pl={1}>
           {description}
         </Text>
