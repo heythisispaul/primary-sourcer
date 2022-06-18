@@ -31,19 +31,18 @@ const controllerMethodMap = {
 const handler: SourcerNextApiHandler = async (req, res) => {
   const { entity } = req.query;
   // @ts-ignore
-  const controller = controllerMethodMap[entity];
-  console.log(entity);
+  const mappedController = controllerMethodMap[entity];
 
-  if (!controller) {
+  if (!mappedController) {
     return res.status(404);
   }
 
   if (req.method === 'POST') {
-    const createdRelatable = await controller.create(req.body);
+    const createdRelatable = await mappedController.create(req.body);
     return res.json(createdRelatable);
   }
 
-  const relatables = await controller.getOptions(req.query.search as string);
+  const relatables = await mappedController.getOptions(req.query.search as string);
   return res.json(relatables);
 };
 

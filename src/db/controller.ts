@@ -10,7 +10,79 @@ import {
   SourceSearchParameters,
   SortKey,
   SourceWithRelations,
+  RelatableInput,
 } from './types';
+
+type RelatableCollection = 'tag' | 'region' | 'author';
+
+const createRelatable = <T>(model: RelatableCollection) => async (data: RelatableInput) => {
+  // @ts-ignore
+  const created = await client[model].create({ data }) as T;
+  return created;
+};
+
+const addRelatableToSource = (idsType: keyof Source) => async (
+  sourceId: string,
+  relatableId: string,
+) => {
+  const updatedSource = await client.source.update({
+    where: { id: sourceId },
+    data: {
+      [idsType]: {
+        push: relatableId,
+      },
+    },
+  });
+
+  return updatedSource;
+};
+
+// There is no remove from list function in Prisma :(
+const removeRelatableFromSource = (idsType: keyof Source) => async (
+  sourceId: string,
+  relatableIds: string | string[],
+) => {
+  const relatablestoRemove = [relatableIds].flat();
+  const sourceToUpdate = await client.source.findUnique({ where: { id: sourceId } });
+  const sourceList = sourceToUpdate && sourceToUpdate[idsType];
+  if (sourceList) {
+    const updatedTagsList = (sourceList as string[])
+      .filter((tag) => !relatablestoRemove.includes(tag));
+
+    const updatedSource = await client.source.update({
+      where: { id: sourceId },
+      data: {
+        tagIds: {
+          set: updatedTagsList,
+        },
+      },
+    });
+
+    return updatedSource;
+  }
+
+  return sourceToUpdate;
+};
+
+export const getRelatableOptions = <T>(model: RelatableCollection) => async (
+  searchTerm: string,
+  limit = 10,
+) => {
+  const relatables = await client[model].findMany({
+    take: limit,
+    where: {
+      name: { contains: searchTerm, mode: 'insensitive' },
+    },
+    select: {
+      name: true,
+      id: true,
+      createdAt: true,
+    },
+  });
+
+  // @ts-ignore
+  return relatables as T[];
+};
 
 export namespace Controller {
   // SOURCES
@@ -45,11 +117,6 @@ export namespace Controller {
       },
     });
     return updatedSource;
-  }
-
-  export async function createTag(data: CreateInput<Tag>) {
-    const newTag = await client.tag.create({ data });
-    return newTag;
   }
 
   export async function getPageOfSources({
@@ -98,170 +165,21 @@ export namespace Controller {
     return searchResults as unknown as SourceWithRelations[];
   }
 
-  // AUTHORS
-  export async function createAuthor(data: CreateInput<Author>) {
-    const newAuthor = await client.author.create({ data });
-    return newAuthor;
-  }
-
-  export async function addAuthorToSource(sourceId: string, authorId: string) {
-    const updatedSource = await client.source.update({
-      where: { id: sourceId },
-      data: {
-        authorIds: {
-          push: authorId,
-        },
-      },
-    });
-
-    return updatedSource;
-  }
-
-  export async function removeAuthorsFromSource(sourceId: string, authorIds: string | string[]) {
-    const authorsToRemove = [authorIds].flat();
-    const sourceToUpdate = await client.source.findUnique({ where: { id: sourceId } });
-    const updateAuthorList = sourceToUpdate?.authorIds
-      .filter((author) => !authorsToRemove.includes(author));
-
-    if (updateAuthorList) {
-      const updatedSource = await client.source.update({
-        where: { id: sourceId },
-        data: {
-          authorIds: {
-            set: updateAuthorList,
-          },
-        },
-      });
-
-      return updatedSource;
-    }
-
-    return sourceToUpdate;
-  }
-
-  export async function getTagOptions(searchTerm: string, limit = 10) {
-    const tags = await client.tag.findMany({
-      take: limit,
-      where: {
-        name: { contains: searchTerm, mode: 'insensitive' },
-      },
-      select: {
-        name: true,
-        id: true,
-        createdAt: true,
-      },
-    });
-
-    return tags;
-  }
-
   // TAGS
-  export async function addTagToSource(sourceId: string, tagId: string) {
-    const updatedSource = await client.source.update({
-      where: { id: sourceId },
-      data: {
-        tagIds: {
-          push: tagId,
-        },
-      },
-    });
+  export const createTag = createRelatable<Tag>('tag');
+  export const getTagOptions = getRelatableOptions<Tag>('tag');
+  export const addTagToSource = addRelatableToSource('tagIds');
+  export const removeTagFromSource = removeRelatableFromSource('tagIds');
 
-    return updatedSource;
-  }
-
-  // There is no remove from list function in Prisma :(
-  export async function removeTagsFromSource(sourceId: string, tagIds: string | string[]) {
-    const tagsToRemove = [tagIds].flat();
-    const sourceToUpdate = await client.source.findUnique({ where: { id: sourceId } });
-    const updatedTagsList = sourceToUpdate?.tagIds.filter((tag) => !tagsToRemove.includes(tag));
-    if (updatedTagsList) {
-      const updatedSource = await client.source.update({
-        where: { id: sourceId },
-        data: {
-          tagIds: {
-            set: updatedTagsList,
-          },
-        },
-      });
-
-      return updatedSource;
-    }
-
-    return sourceToUpdate;
-  }
-
-  // TODO: Consolidate a lot of the similar methods in here
-  export async function getAuthorOptions(searchTerm: string, limit = 10) {
-    const authors = await client.author.findMany({
-      take: limit,
-      where: {
-        name: { contains: searchTerm, mode: 'insensitive' },
-      },
-      select: {
-        name: true,
-        id: true,
-        createdAt: true,
-      },
-    });
-
-    return authors;
-  }
+  // AUTHORS
+  export const createAuthor = createRelatable<Author>('author');
+  export const getAuthorOptions = getRelatableOptions<Author>('author');
+  export const addAuthorToSource = addRelatableToSource('authorIds');
+  export const removeAuthorsFromSource = removeRelatableFromSource('authorIds');
 
   // REGIONS
-  export async function createRegion(data: CreateInput<Region>) {
-    const newAuthor = await client.region.create({ data });
-    return newAuthor;
-  }
-
-  export async function addRegionToSource(sourceId: string, regionId: string) {
-    const updatedSource = await client.source.update({
-      where: { id: sourceId },
-      data: {
-        regionIds: {
-          push: regionId,
-        },
-      },
-    });
-
-    return updatedSource;
-  }
-
-  // There is no remove from list function in Prisma :(
-  export async function removeRegionsFromSource(sourceId: string, regionIds: string | string[]) {
-    const regionsToRemove = [regionIds].flat();
-    const sourceToUpdate = await client.source.findUnique({ where: { id: sourceId } });
-    const updatedRegionList = sourceToUpdate?.tagIds
-      .filter((tag) => !regionsToRemove.includes(tag));
-    if (updatedRegionList) {
-      const updatedSource = await client.source.update({
-        where: { id: sourceId },
-        data: {
-          regionIds: {
-            set: updatedRegionList,
-          },
-        },
-      });
-
-      return updatedSource;
-    }
-
-    return sourceToUpdate;
-  }
-
-  // TODO: Consolidate a lot of the similar methods in here
-  export async function getRegionOptions(searchTerm: string, limit = 10) {
-    const authors = await client.region.findMany({
-      take: limit,
-      where: {
-        name: { contains: searchTerm, mode: 'insensitive' },
-      },
-      select: {
-        name: true,
-        id: true,
-        createdAt: true,
-      },
-    });
-
-    return authors;
-  }
+  export const createRegion = createRelatable<Region>('region');
+  export const getRegionOptions = getRelatableOptions<Region>('region');
+  export const addRegionToSource = addRelatableToSource('regionIds');
+  export const removeRegionsFromSource = removeRelatableFromSource('regionIds');
 }

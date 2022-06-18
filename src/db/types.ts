@@ -8,6 +8,11 @@ import {
 
 export type CreateInput<T> = Omit<T, 'createdAt' | 'id'>;
 
+export type RelatableInput = {
+  name: string;
+  sourceIds: string[];
+}
+
 // eslint-disable-next-line no-shadow
 export enum SortKey {
   CREATED = 'createdAt',
