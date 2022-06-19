@@ -13,12 +13,12 @@ const validationWrapper = validationMiddleware({
 
 const handler: SourcerNextApiHandler = async (req, res) => {
   if (req.method === 'POST') {
-    const createdSource = await Controller.createSource(req.body);
+    const createdSource = await Controller.sources.create(req.body);
     return res.json(createdSource);
   }
 
   console.log(req.query);
-  const sources = await Controller.getPageOfSources({});
+  const sources = await Controller.sources.getPage({});
   return res.json(sources);
 };
 

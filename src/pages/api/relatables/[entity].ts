@@ -12,26 +12,11 @@ const validationWrapper = validationMiddleware({
   schema: Validators.authorCreate,
 });
 
-const controllerMethodMap = {
-  author: {
-    create: Controller.createAuthor,
-    getOptions: Controller.getAuthorOptions,
-  },
-  tag: {
-    create: Controller.createTag,
-    getOptions: Controller.getTagOptions,
-  },
-  region: {
-    create: Controller.createRegion,
-    getOptions: Controller.getRegionOptions,
-  },
-};
-
 // TODO: Allow for updates
 const handler: SourcerNextApiHandler = async (req, res) => {
   const { entity } = req.query;
   // @ts-ignore
-  const mappedController = controllerMethodMap[entity];
+  const mappedController = Controller[entity];
 
   if (!mappedController) {
     return res.status(404);

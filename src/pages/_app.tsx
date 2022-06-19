@@ -3,6 +3,7 @@ import { ReactNode, ReactElement } from 'react';
 import { ChakraProvider } from '@chakra-ui/react';
 import { NextPage } from 'next';
 import type { AppProps } from 'next/app';
+import { SessionProvider } from 'next-auth/react';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import theme from '../client/theme';
 
@@ -21,9 +22,11 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
 
   return (
     <ChakraProvider theme={theme}>
-      <QueryClientProvider client={queryClient}>
-        {getLayout(<Component {...pageProps} />)}
-      </QueryClientProvider>
+      <SessionProvider>
+        <QueryClientProvider client={queryClient}>
+          {getLayout(<Component {...pageProps} />)}
+        </QueryClientProvider>
+      </SessionProvider>
     </ChakraProvider>
   );
 }

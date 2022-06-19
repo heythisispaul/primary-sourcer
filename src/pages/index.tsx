@@ -14,9 +14,9 @@ export interface HomeProps {
 }
 
 // eslint-disable-next-line @next/next/no-typos
-export const getServerSideProps = serversidePropsWrapper(async (context, controller) => {
+export const getServerSideProps = serversidePropsWrapper(async ({ context, controller }) => {
   const searchOpts = context.query as unknown as SourceSearchParameters;
-  const sources = await controller.getPageOfSources(searchOpts ?? {});
+  const sources = await controller.sources.getPage(searchOpts ?? {});
   return { props: { stringifiedSources: JSON.stringify(sources) } };
 });
 

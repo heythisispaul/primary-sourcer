@@ -8,6 +8,7 @@ import {
 } from 'yup';
 import { mustBeFewerThan } from './utils';
 
+// TODO: simplify all of the 'relatables' into one schema
 export namespace Validators {
   const sourceTitle = string()
     .min(4, 'Must be at least 4 characters')
@@ -49,5 +50,12 @@ export namespace Validators {
       .min(3, 'Must be at least 3 characters')
       .max(...mustBeFewerThan(25))
       .required('Name is required'),
+  });
+
+  export const profile = object({
+    username: string()
+      .min(3, 'must be at least 3 characters')
+      .max(...mustBeFewerThan(25))
+      .required('Username is required'),
   });
 }

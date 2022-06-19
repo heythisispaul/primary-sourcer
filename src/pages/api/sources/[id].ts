@@ -11,11 +11,11 @@ const handler: SourcerNextApiHandler = async (req, res) => {
 
   if (req.method === 'PATCH') {
     console.log(req.body);
-    const updatedSource = await Controller.updateSource(id, req.body);
+    const updatedSource = await Controller.sources.update(id, req.body);
     return res.json(updatedSource);
   }
 
-  const source = await Controller.getSource(id);
+  const source = await Controller.sources.get(id);
   return res.json(source);
 };
 

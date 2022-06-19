@@ -8,6 +8,7 @@ import {
   ButtonGroup,
   useMediaQuery,
 } from '@chakra-ui/react';
+import Link from 'next/link';
 import { HamburgerIcon } from '@chakra-ui/icons';
 
 const LoginControls = () => {
@@ -16,12 +17,16 @@ const LoginControls = () => {
   if (isDesktop) {
     return (
       <ButtonGroup gap={2} colorScheme="orange">
-        <Button disabled variant="outline">
-          Log In
-        </Button>
-        <Button disabled>
-          Sign Up
-        </Button>
+        <Link href="/login">
+          <Button variant="outline">
+            Log In
+          </Button>
+        </Link>
+        <Link href="/signup">
+          <Button>
+            Sign Up
+          </Button>
+        </Link>
       </ButtonGroup>
     );
   }
@@ -35,12 +40,16 @@ const LoginControls = () => {
         variant="outline"
       />
       <MenuList>
-        <MenuItem disabled>
-          Log In
-        </MenuItem>
-        <MenuItem disabled>
-          Sign Up
-        </MenuItem>
+        <Link href="/login">
+          <MenuItem disabled>
+            Log In
+          </MenuItem>
+        </Link>
+        <Link href="/signup">
+          <MenuItem>
+            Sign Up
+          </MenuItem>
+        </Link>
       </MenuList>
     </Menu>
   );

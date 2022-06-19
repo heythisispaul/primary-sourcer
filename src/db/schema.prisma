@@ -14,17 +14,21 @@ enum yearType {
 }
 
 model Source {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  createdAt   DateTime @default(now())
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt   DateTime  @default(now())
+  createdById String
+  createdBy   User      @relation(fields: [createdById], references: [id])
   title       String
   href        String
   description String?
-  tagIds      String[] @db.ObjectId
-  tags        Tag[]    @relation(fields: [tagIds], references: [id])
-  authorIds   String[] @db.ObjectId
-  authors     Author[] @relation(fields: [authorIds], references: [id])
-  regionIds   String[] @db.ObjectId
-  regions     Region[] @relation(fields: [regionIds], references: [id])
+  tagIds      String[]  @db.ObjectId
+  tags        Tag[]     @relation(fields: [tagIds], references: [id])
+  authorIds   String[]  @db.ObjectId
+  authors     Author[]  @relation(fields: [authorIds], references: [id])
+  regionIds   String[]  @db.ObjectId
+  regions     Region[]  @relation(fields: [regionIds], references: [id])
+  listIds     String[]  @db.ObjectId
+  lists       List[]    @relation(fields: [listIds], references: [id])
   yearType    yearType?
   yearStart   Int?
   yearEnd     Int?
@@ -52,4 +56,27 @@ model Author {
   name      String   @unique
   sourceIds String[] @db.ObjectId
   sources   Source[] @relation(fields: [sourceIds], references: [id])
+}
+
+model List {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt   DateTime @default(now())
+  name        String
+  createdById String
+  createdBy   User     @relation(fields: [createdById], references: [id])
+  sourceIds   String[] @db.ObjectId
+  sources     Source[] @relation(fields: [sourceIds], references: [id])
+
+  @@unique([createdById, name])
+}
+
+model User {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  externalId String   @unique
+  isAdmin    Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  username   String   @unique
+  lastLogin  DateTime @default(now())
+  sources    Source[]
+  lists      List[]
 }

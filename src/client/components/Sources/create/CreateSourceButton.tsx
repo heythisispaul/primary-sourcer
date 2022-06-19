@@ -23,6 +23,7 @@ import {
 } from '@chakra-ui/react';
 import { AddIcon } from '@chakra-ui/icons';
 import { useMutation, useQueryClient } from 'react-query';
+import { useSession } from 'next-auth/react';
 import { Source } from '@prisma/client';
 import { CreateSourceForm } from './CreateSourceForm';
 import EditingSource from '../../../contexts/EditingSource';
@@ -34,6 +35,7 @@ export const CreateSourceButton: FunctionComponent<{ children: ReactNode }> = ({
 }) => {
   const { isOpen, onClose, onOpen } = useDisclosure();
   const [isDesktop] = useMediaQuery('(min-width: 600px)');
+  const { status } = useSession();
   const [sourceToEdit, setSourceToEdit] = useState<SourceWithRelations>();
   const queryClient = useQueryClient();
   const fetchClient = useFetchClient<SourceWithRelations, CreateSourceFormData>(
@@ -75,6 +77,7 @@ export const CreateSourceButton: FunctionComponent<{ children: ReactNode }> = ({
       'aria-label': 'New Source',
       position: 'fixed',
       onClick: onOpen,
+      disabled: status !== 'authenticated',
     } as const;
 
     if (isDesktop) {
@@ -89,7 +92,7 @@ export const CreateSourceButton: FunctionComponent<{ children: ReactNode }> = ({
       // @ts-ignore
       <IconButton {...commonProps} icon={<AddIcon />} borderRadius="25px" />
     );
-  }, [isDesktop, onOpen]);
+  }, [isDesktop, onOpen, status]);
 
   return (
     <EditingSource.Provider value={contextValue}>
