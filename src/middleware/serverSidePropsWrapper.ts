@@ -21,17 +21,17 @@ export type WrappedServerSideProps<T = unknown> = (
 export const serversidePropsWrapper = <T>(
   wrapped: WrappedServerSideProps<T>,
 ): GetServerSideProps => async (context) => {
+    const CREATE_PROFILE = '/create-profile';
     try {
       const session = await getSession(context);
-
-      // if (session && !session.profile) {
-      //   return {
-      //     redirect: {
-      //       destination: '/create-profile',
-      //       permanent: false,
-      //     },
-      //   };
-      // }
+      if (session && !session.profile?.username && context.req.url !== CREATE_PROFILE) {
+        return {
+          redirect: {
+            destination: CREATE_PROFILE,
+            permanent: false,
+          },
+        };
+      }
 
       const result = await wrapped({ context, controller: Controller, session });
       return result;

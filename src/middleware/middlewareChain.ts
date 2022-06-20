@@ -1,15 +1,16 @@
-import { withSession, WithSessionInit } from './withSession';
-import errorHandlingMiddleware, { HttpMethod } from './errorWrapper';
-import validateMiddleware, { ValidationOptionsForMethod } from './validate';
+import { WithSessionInit } from './withSession';
+import { HttpMethod } from './errorWrapper';
+import { ValidationOptionsForMethod } from './validate';
 import { SourcerNextApiHandler } from './types';
 
+// TODO: actually get this stuff to work
 export interface MiddlewareChainInit {
   validationOpts?: ValidationOptionsForMethod;
   methods?: HttpMethod[];
   sessionOpts?: WithSessionInit;
 }
 
-const ALL_METHODS: HttpMethod[] = [
+export const ALL_METHODS: HttpMethod[] = [
   'DELETE',
   'GET',
   'PATCH',
@@ -30,27 +31,6 @@ export const compose = (...funcs: SourcerNextApiHandler<any>[]) => {
 
   return funcs.reduce(
     // @ts-ignore
-    (a, b) => (...args: any) => a(b(...args)),
+    (a, b) => async (...args: any) => a(b(...args)),
   );
 };
-
-export const middlewareChain = <T>({
-  validationOpts,
-  methods,
-  sessionOpts = {},
-}: MiddlewareChainInit) => (
-    wrapped: SourcerNextApiHandler<T>,
-  ): SourcerNextApiHandler<any> => {
-    const httpMethods = methods ?? ALL_METHODS;
-    const funcs = [
-      errorHandlingMiddleware(httpMethods),
-      withSession(sessionOpts),
-    ];
-
-    if (validationOpts) {
-      funcs.push(validateMiddleware(validationOpts));
-    }
-
-    // @ts-ignore
-    return compose([...funcs, wrapped]);
-  };

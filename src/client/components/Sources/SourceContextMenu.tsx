@@ -12,12 +12,14 @@ export interface SourceContextMenuProps {
   isInEditMode: boolean;
   onEdit: () => void;
   onDelete: () => void;
+  canEdit?: boolean;
 }
 
 export const SourceContextMenu: FunctionComponent<SourceContextMenuProps> = ({
   isInEditMode,
   onEdit,
   onDelete,
+  canEdit,
 }) => {
   const onClickWrapper = (on: () => void) => (e: SyntheticEvent) => {
     e.stopPropagation();
@@ -36,10 +38,10 @@ export const SourceContextMenu: FunctionComponent<SourceContextMenuProps> = ({
         onClick={(e) => e.stopPropagation()}
       />
       <MenuList>
-        <MenuItem disabled={isInEditMode} onClick={onClickWrapper(onEdit)}>
+        <MenuItem isDisabled={isInEditMode || !canEdit} onClick={onClickWrapper(onEdit)}>
           Edit
         </MenuItem>
-        <MenuItem disabled onClick={onClickWrapper(onDelete)}>
+        <MenuItem isDisabled={isInEditMode || !canEdit} onClick={onClickWrapper(onDelete)}>
           Delete
         </MenuItem>
       </MenuList>

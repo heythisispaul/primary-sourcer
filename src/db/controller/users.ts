@@ -2,7 +2,7 @@ import { User } from '@prisma/client';
 import client from '../client';
 
 export const userController = () => ({
-  async create(userInput: Pick<User, 'externalId' | 'username'>) {
+  async create(userInput: Pick<User, 'externalId' | 'username' | 'pictureSrc'>) {
     const newUser = await client.user.create({ data: userInput });
     return newUser;
   },

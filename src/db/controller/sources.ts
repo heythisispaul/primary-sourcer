@@ -78,6 +78,12 @@ export const sourceController = () => ({
             id: true,
           },
         },
+        createdBy: {
+          select: {
+            username: true,
+            id: true,
+          },
+        },
       },
       orderBy: {
         [sortKey]: 'desc',

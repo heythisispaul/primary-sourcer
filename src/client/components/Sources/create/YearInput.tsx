@@ -40,8 +40,8 @@ export const YearInput: FunctionComponent<YearInputProps> = ({
       />
       <RadioGroup onChange={setEra} value={era} colorScheme="orange">
         <Stack direction="row">
-          <Radio value="AD">AD</Radio>
           <Radio value="BC">BC</Radio>
+          <Radio value="AD">AD</Radio>
         </Stack>
       </RadioGroup>
     </Flex>

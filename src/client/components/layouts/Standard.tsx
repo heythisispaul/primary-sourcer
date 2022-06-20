@@ -11,7 +11,7 @@ export interface LayoutProps {
   children?: ReactNode;
 }
 
-const HEADER_HEIGHT = 56;
+const HEADER_HEIGHT = 68;
 const FOOTER_HEIGHT = 60;
 const delta = HEADER_HEIGHT + FOOTER_HEIGHT + 15;
 

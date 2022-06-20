@@ -14,15 +14,12 @@ const validateMiddleware = (
   if (!req.validationErrors) {
     req.validationErrors = [];
   }
-
   const verbsToSkip = ['GET', 'DELETE', 'OPTIONS'];
 
   if (verbsToSkip.includes(req.method || '')) {
     return wrapped(req, res);
   }
 
-  console.log('validating');
-  console.log(req.body);
   const { selector, schema, forceNext } = validationOptions;
   const value = selector ? selector(req) : req.body;
   const validationError = await validate(schema, value);

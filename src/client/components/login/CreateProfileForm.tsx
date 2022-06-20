@@ -27,7 +27,7 @@ export const CreateProfileForm: FunctionComponent = () => {
     handleSubmit,
     register,
     formState: { errors },
-  } = useForm<CreateProfileFormData>({ resolver: yupResolver(Validators.username) });
+  } = useForm<CreateProfileFormData>({ resolver: yupResolver(Validators.profile) });
 
   const fetchClient = useFetchClient<User, CreateProfileFormData>('/api/profile', (data) => ({
     method: 'POST',
@@ -46,7 +46,7 @@ export const CreateProfileForm: FunctionComponent = () => {
       bg="white"
       justifyContent="space-around"
       alignItems="center"
-      maxH="250px"
+      maxH="325px"
       p={5}
       mt="5vh"
     >
@@ -56,12 +56,13 @@ export const CreateProfileForm: FunctionComponent = () => {
       <Divider />
       {/* @ts-ignore */}
       <form onSubmit={handleSubmit(mutate)}>
-        <Flex direction="column" justifyContent="center" mt={2}>
+        <Flex direction="column" justifyContent="center" mt={2} gap={3}>
           <AppFormControl
             label="Username"
             errorMessage={errors?.username?.message}
+            helperText="This will be public to other users"
           >
-            <Input {...register('username')} />
+            <Input autoComplete="off" {...register('username')} />
           </AppFormControl>
           <Button
             type="submit"
@@ -71,6 +72,7 @@ export const CreateProfileForm: FunctionComponent = () => {
             Create
           </Button>
           <Button
+            variant="outline"
             colorScheme="orange"
             disabled={isLoading}
             onClick={() => signOut()}

@@ -1,10 +1,10 @@
 import { FunctionComponent, memo } from 'react';
 import { Button, Icon } from '@chakra-ui/react';
 import { signIn } from 'next-auth/react';
-import { FaFacebook, FaGoogle } from 'react-icons/fa';
+import { FaFacebook, FaGoogle, FaDiscord } from 'react-icons/fa';
 
 export interface AuthButtonProps {
-  provider: 'facebook' | 'google';
+  provider: 'facebook' | 'google' | 'discord';
 }
 
 export const AuthButton: FunctionComponent<AuthButtonProps> = memo(({ provider }) => {
@@ -12,6 +12,8 @@ export const AuthButton: FunctionComponent<AuthButtonProps> = memo(({ provider }
     switch (provider) {
       case 'facebook':
         return FaFacebook;
+      case 'discord':
+        return FaDiscord;
       default:
         return FaGoogle;
     }

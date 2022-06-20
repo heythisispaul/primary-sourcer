@@ -2,6 +2,7 @@
 import nextAuth from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
 import FacebookProvider from 'next-auth/providers/facebook';
+import DiscordProvider from 'next-auth/providers/discord';
 import { Controller } from '../../../db';
 // TODO: Get models to hook up with Mongo and NextAuth
 // for now, just relying on tokens is fine
@@ -17,6 +18,10 @@ const nextAuthHandler = nextAuth({
       clientId: process.env.GOOGLE_AUTH_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_AUTH_CLIENT_SECRET!,
     }),
+    DiscordProvider({
+      clientId: process.env.DISCORD_AUTH_CLIENT_ID!,
+      clientSecret: process.env.DISCORD_AUTH_CLIENT_SECRET!,
+    }),
   ],
   callbacks: {
     signIn: async (signInResult) => {
@@ -28,6 +33,7 @@ const nextAuthHandler = nextAuth({
         if (profile) {
           await Controller.users.update(profile.id, {
             lastLogin: new Date(),
+            pictureSrc: signInResult?.profile?.image,
           });
         }
         return true;

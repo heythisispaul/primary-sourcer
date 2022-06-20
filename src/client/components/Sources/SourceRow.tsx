@@ -6,6 +6,7 @@ import {
   Link,
   useMediaQuery,
 } from '@chakra-ui/react';
+import { useSession } from 'next-auth/react';
 import { SourceContextMenu } from './SourceContextMenu';
 import { TagContainer } from '../common/TagContainer';
 import { SourceWithRelations } from '../../../db';
@@ -36,12 +37,25 @@ export const SourceRow: FunctionComponent<SourceRowProps> = ({
     yearStart,
     yearEnd,
     yearType,
+    createdBy,
   } = source;
+  const { data: session } = useSession();
   const { setSourceToEdit, sourceToEdit } = useEditingSourceControls();
   const isInEditMode = Boolean(sourceToEdit);
   const [isDesktop] = useMediaQuery('(min-width: 600px)');
   const isExpanded = Boolean((activeId === id));
   const { host } = toURL(href);
+
+  const { isOwner, canEdit } = useMemo(() => {
+    const isAdmin = session?.profile?.isAdmin;
+    const currentId = session?.profile?.id;
+    // eslint-disable-next-line no-shadow
+    const isOwner = currentId === createdBy.id;
+    return {
+      isOwner,
+      canEdit: isAdmin || isOwner,
+    };
+  }, [session, createdBy]);
 
   const timeFrameDisplay = useMemo(() => {
     const eraDisplay = (year: number | null) => `${Math.abs(year ?? 1)} ${(year ?? 1) > 0 ? 'AD' : 'BC'}`;
@@ -97,6 +111,7 @@ export const SourceRow: FunctionComponent<SourceRowProps> = ({
           isInEditMode={isInEditMode}
           onEdit={() => setSourceToEdit(source)}
           onDelete={() => {}}
+          canEdit={canEdit}
         />
       </Flex>
       {!isDesktop && sourceAndAuthors}
@@ -117,7 +132,7 @@ export const SourceRow: FunctionComponent<SourceRowProps> = ({
           {description}
         </Text>
         <Text fontSize=".8em" color="gray.400" mt={2}>
-          {`Created ${toUSDate(createdAt)}`}
+          {`Created ${toUSDate(createdAt)} by ${isOwner ? 'You' : createdBy.username}`}
         </Text>
       </Collapse>
     </Flex>

@@ -4,7 +4,6 @@ import { serversidePropsWrapper } from '../middleware';
 import { CreateProfileForm } from '../client/components/login/CreateProfileForm';
 
 export const getServerSideProps = serversidePropsWrapper(async ({ session }) => {
-  console.log(session);
   if (!session) {
     return {
       redirect: {

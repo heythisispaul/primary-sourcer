@@ -23,7 +23,7 @@ export const LoginForm: FunctionComponent<LoginFormProps> = ({
     bg="white"
     justifyContent="space-around"
     alignItems="center"
-    maxH="250px"
+    maxH="275px"
     p={5}
     mt="5vh"
   >
@@ -34,6 +34,7 @@ export const LoginForm: FunctionComponent<LoginFormProps> = ({
     <Flex direction="column" justifyContent="center" mt={2}>
       <AuthButton provider="google" />
       <AuthButton provider="facebook" />
+      <AuthButton provider="discord" />
     </Flex>
     <Link href="/">
       <Button

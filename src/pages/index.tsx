@@ -1,4 +1,5 @@
 import { useQuery } from 'react-query';
+import { Session } from 'next-auth';
 import { getLayout } from '../client/components/layouts/Standard';
 import { NextPageWithLayout } from './_app';
 import { CreateSourceButton } from '../client/components/Sources/create/CreateSourceButton';
@@ -11,13 +12,18 @@ import { safelyParseJson } from '../client/utils';
 export interface HomeProps {
   stringifiedSources?: string;
   error?: string;
+  session?: Session;
 }
 
 // eslint-disable-next-line @next/next/no-typos
-export const getServerSideProps = serversidePropsWrapper(async ({ context, controller }) => {
+export const getServerSideProps = serversidePropsWrapper(async ({
+  context,
+  controller,
+  session,
+}) => {
   const searchOpts = context.query as unknown as SourceSearchParameters;
   const sources = await controller.sources.getPage(searchOpts ?? {});
-  return { props: { stringifiedSources: JSON.stringify(sources) } };
+  return { props: { stringifiedSources: JSON.stringify(sources), session } };
 });
 
 const Home: NextPageWithLayout<HomeProps> = ({

@@ -4,6 +4,7 @@ import {
   Author,
   Source,
   Region,
+  User,
 } from '@prisma/client';
 
 export type CreateInput<T> = Omit<T, 'createdAt' | 'id'>;
@@ -30,4 +31,5 @@ export type SourceWithRelations = Source & {
   tags: Pick<Tag, 'id' | 'name'>[],
   authors: Pick<Author, 'id' | 'name'>[]
   regions: Pick<Region, 'id' | 'name'>[]
+  createdBy: Pick<User, 'id' | 'username'>
 };

@@ -10,7 +10,7 @@ export interface WithSessionInit {
 export const withSession = ({
   ownershipChecker,
   requireSession,
-}: WithSessionInit) => (wrapped: SourcerNextApiHandler): SourcerNextApiHandler => async (
+}: WithSessionInit = {}) => (wrapped: SourcerNextApiHandler): SourcerNextApiHandler => async (
   req,
   res,
 ) => {

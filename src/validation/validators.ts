@@ -38,17 +38,10 @@ export namespace Validators {
     }),
   }).strict();
 
-  export const authorCreate = object({
+  export const relatable = object({
     name: string()
       .min(4, 'Must be at least 4 characters')
       .max(...mustBeFewerThan(100))
-      .required('Name is required'),
-  });
-
-  export const tagCreate = object({
-    name: string()
-      .min(3, 'Must be at least 3 characters')
-      .max(...mustBeFewerThan(25))
       .required('Name is required'),
   });
 
