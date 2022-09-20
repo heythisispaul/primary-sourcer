@@ -17,13 +17,22 @@ export type RelatableInput = {
 // eslint-disable-next-line no-shadow
 export enum SortKey {
   CREATED = 'createdAt',
+  AGE_START = 'ageStart',
+  AGE_END = 'ageEnd',
 }
 
 export interface SourceSearchParameters {
   offset?: number;
-  searchTerm?: string;
-  tags?: Tag['id'][];
-  authors?: Author['id'][];
+  title?: string;
+  tagIds?: Tag['id'][];
+  tagsInclusive: boolean;
+  authorIds?: Author['id'][];
+  authorsInclusive: boolean;
+  regionIds?: Region['id'][];
+  regionsInclusive: boolean;
+  yearType?: Source['yearType'];
+  yearStart?: number;
+  yearEnd?: number;
   sortKey?: SortKey;
 }
 

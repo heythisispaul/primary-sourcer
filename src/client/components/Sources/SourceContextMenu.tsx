@@ -1,12 +1,18 @@
-import { FunctionComponent, SyntheticEvent } from 'react';
+import { FunctionComponent, SyntheticEvent, useMemo } from 'react';
 import {
   Menu,
   MenuButton,
   MenuList,
   MenuItem,
   IconButton,
+  MenuDivider,
 } from '@chakra-ui/react';
-import { HamburgerIcon } from '@chakra-ui/icons';
+import {
+  HamburgerIcon,
+  EditIcon,
+  DeleteIcon,
+  AddIcon,
+} from '@chakra-ui/icons';
 
 export interface SourceContextMenuProps {
   isInEditMode: boolean;
@@ -27,6 +33,32 @@ export const SourceContextMenu: FunctionComponent<SourceContextMenuProps> = ({
     on();
   };
 
+  const ownerControls = useMemo(() => {
+    if (!canEdit) {
+      return null;
+    }
+
+    return (
+      <>
+        <MenuDivider />
+        <MenuItem
+          isDisabled={isInEditMode}
+          onClick={onClickWrapper(onEdit)}
+          icon={<EditIcon />}
+        >
+          Edit
+        </MenuItem>
+        <MenuItem
+          isDisabled={isInEditMode}
+          onClick={onClickWrapper(onDelete)}
+          icon={<DeleteIcon />}
+        >
+          Delete
+        </MenuItem>
+      </>
+    );
+  }, [isInEditMode, canEdit, onEdit, onDelete]);
+
   return (
     <Menu colorScheme="orange">
       <MenuButton
@@ -38,12 +70,10 @@ export const SourceContextMenu: FunctionComponent<SourceContextMenuProps> = ({
         onClick={(e) => e.stopPropagation()}
       />
       <MenuList>
-        <MenuItem isDisabled={isInEditMode || !canEdit} onClick={onClickWrapper(onEdit)}>
-          Edit
+        <MenuItem isDisabled icon={<AddIcon />}>
+          Add To List
         </MenuItem>
-        <MenuItem isDisabled={isInEditMode || !canEdit} onClick={onClickWrapper(onDelete)}>
-          Delete
-        </MenuItem>
+        {ownerControls}
       </MenuList>
     </Menu>
   );

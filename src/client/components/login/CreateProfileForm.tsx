@@ -7,6 +7,7 @@ import {
   Divider,
   Input,
 } from '@chakra-ui/react';
+import { Session } from 'next-auth';
 import { useRouter } from 'next/router';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -21,16 +22,21 @@ export interface CreateProfileFormData {
   username: string;
 }
 
-export const CreateProfileForm: FunctionComponent = () => {
+export const CreateProfileForm: FunctionComponent<{ session: Session }> = ({ session }) => {
   const router = useRouter();
+  const isEditUsernameMode = !!router?.query?.edit;
+  const username = session?.profile?.username ?? '';
   const {
     handleSubmit,
     register,
     formState: { errors },
-  } = useForm<CreateProfileFormData>({ resolver: yupResolver(Validators.profile) });
+  } = useForm<CreateProfileFormData>({
+    resolver: yupResolver(Validators.profile),
+    defaultValues: { username },
+  });
 
   const fetchClient = useFetchClient<User, CreateProfileFormData>('/api/profile', (data) => ({
-    method: 'POST',
+    method: isEditUsernameMode ? 'PATCH' : 'POST',
     body: JSON.stringify(data),
   }));
 
@@ -51,7 +57,7 @@ export const CreateProfileForm: FunctionComponent = () => {
       mt="5vh"
     >
       <Heading fontSize="2xl" mb={2}>
-        Create Profile
+        {`${isEditUsernameMode ? 'Edit' : 'Create'} Profile`}
       </Heading>
       <Divider />
       {/* @ts-ignore */}
@@ -69,13 +75,13 @@ export const CreateProfileForm: FunctionComponent = () => {
             colorScheme="orange"
             isLoading={isLoading}
           >
-            Create
+            {isEditUsernameMode ? 'Update' : 'Create'}
           </Button>
           <Button
             variant="outline"
             colorScheme="orange"
             disabled={isLoading}
-            onClick={() => signOut()}
+            onClick={() => (isEditUsernameMode ? router.push('/') : signOut())}
           >
             Cancel
           </Button>

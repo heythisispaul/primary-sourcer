@@ -9,14 +9,11 @@ import {
   Button,
 } from '@chakra-ui/react';
 import { ArrowDownIcon, ArrowUpIcon } from '@chakra-ui/icons';
-import { useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
 import { AppFormControl } from '../../common/AppFormControl';
 import { SearchSelect } from '../../common/SearchSelect';
 import { TagContainer } from '../../common/TagContainer';
 import { YearInput } from './YearInput';
-import { useCreateSourceControls, CreateSourceFormData } from '../../../hooks';
-import { Validators } from '../../../../validation';
+import { useSourceFormControls, CreateSourceFormData } from '../../../hooks';
 import { SourceWithRelations } from '../../../../db';
 import { thisYear } from '../../../utils';
 
@@ -33,22 +30,6 @@ export const CreateSourceForm: FunctionComponent<CreateSourceFormProps> = ({
   sourceToEdit,
 }) => {
   const {
-    register,
-    handleSubmit,
-    setValue,
-    watch,
-    formState: { errors },
-  } = useForm<CreateSourceFormData>({
-    resolver: yupResolver(Validators.sourceCreate),
-    defaultValues: {
-      ...sourceToEdit,
-      description: sourceToEdit?.description ?? '',
-      yearStart: sourceToEdit?.yearStart ?? undefined,
-      yearEnd: sourceToEdit?.yearEnd ?? undefined,
-    },
-  });
-
-  const {
     tags,
     authors,
     regions,
@@ -62,7 +43,12 @@ export const CreateSourceForm: FunctionComponent<CreateSourceFormProps> = ({
     toggleHasYears,
     hasRange,
     toggleHasRange,
-  } = useCreateSourceControls(setValue, sourceToEdit);
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useSourceFormControls(sourceToEdit);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -121,7 +107,7 @@ export const CreateSourceForm: FunctionComponent<CreateSourceFormProps> = ({
             preSelected={tags}
           />
         </AppFormControl>
-        <AppFormControl label="Has Relevant Years" mt={2} errorMessage={errors?.yearType?.message}>
+        <AppFormControl label="Include Relevant Years" mt={2} errorMessage={errors?.yearType?.message}>
           <Switch isChecked={hasYears} onChange={toggleHasYears} ml={2} colorScheme="orange" />
         </AppFormControl>
         <Collapse in={hasYears}>

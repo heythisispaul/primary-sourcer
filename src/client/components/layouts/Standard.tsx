@@ -28,7 +28,7 @@ export const StandardLayout: FunctionComponent<LayoutProps> = ({
       <Flex
         id="layout-container"
         w="100%"
-        maxW="1200px"
+        maxW="1280px"
         as="main"
         justifyContent="center"
       >

@@ -32,7 +32,7 @@ const ProfileAvatar = forwardRef<
     p={2}
     _hover={{ backgroundColor: 'gray.200' }}
   >
-    <Text mr={2} color="gray.500">{shouldRenderName ? props.name : ''}</Text>
+    {shouldRenderName && <Text mr={2} color="gray.500">{props.name}</Text>}
     {
       props.imagesrc
         ? (

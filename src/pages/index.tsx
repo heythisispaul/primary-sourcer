@@ -5,8 +5,9 @@ import { NextPageWithLayout } from './_app';
 import { CreateSourceButton } from '../client/components/Sources/create/CreateSourceButton';
 import { SourceResults } from '../client/components/Sources';
 import { serversidePropsWrapper } from '../middleware';
-import { SourceSearchParameters, SourceWithRelations } from '../db';
-import { useFetchClient } from '../client/hooks';
+import { parseBase64ToObject } from '../utils';
+import { SourceWithRelations } from '../db';
+import { useFetchClient, useUrlParamsUpdate } from '../client/hooks';
 import { safelyParseJson } from '../client/utils';
 
 export interface HomeProps {
@@ -15,29 +16,36 @@ export interface HomeProps {
   session?: Session;
 }
 
-// eslint-disable-next-line @next/next/no-typos
 export const getServerSideProps = serversidePropsWrapper(async ({
   context,
   controller,
   session,
 }) => {
-  const searchOpts = context.query as unknown as SourceSearchParameters;
-  const sources = await controller.sources.getPage(searchOpts ?? {});
+  const searchOpts = context.query as any;
+  const sources = await controller.sources.getPage(parseBase64ToObject(searchOpts.search) ?? {});
   return { props: { stringifiedSources: JSON.stringify(sources), session } };
 });
 
 const Home: NextPageWithLayout<HomeProps> = ({
   stringifiedSources = '[]',
 }) => {
+  const [queryString] = useUrlParamsUpdate('search');
+  const sourceQueryKey = ['sources', queryString];
   const sources = safelyParseJson<SourceWithRelations[]>(stringifiedSources);
-  const fetchClient = useFetchClient<SourceWithRelations[]>('/api/sources');
+
+  console.log(sourceQueryKey);
+
+  const fetchClient = useFetchClient<SourceWithRelations[]>(`/api/sources?filter=${queryString}`);
   const {
     data,
-  } = useQuery(['sources'], fetchClient, { initialData: sources });
+    isFetching,
+  } = useQuery(sourceQueryKey, fetchClient, { initialData: sources, staleTime: 180 });
+
+  console.log(isFetching);
 
   return (
     <CreateSourceButton>
-      <SourceResults sources={data ?? []} />
+      <SourceResults sources={data ?? undefined} isFetching={isFetching} />
     </CreateSourceButton>
   );
 };

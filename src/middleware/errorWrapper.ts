@@ -1,6 +1,6 @@
 import { SourcerNextApiHandler } from './types';
 
-// I have to assume there's a real version of this somewhere?
+// I have to assume there's a real version of this somewhere in the deps?
 export type HttpMethod = 'GET' | 'POST' | 'PATCH' | 'DELETE' | 'PUT';
 
 const errorHandlingMiddleware = (methods: HttpMethod[]) => (

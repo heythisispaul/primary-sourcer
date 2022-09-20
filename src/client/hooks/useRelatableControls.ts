@@ -1,22 +1,16 @@
-import { useState, useCallback, useEffect } from 'react';
+import {
+  useState,
+  useEffect,
+  useCallback,
+} from 'react';
 import { UseFormSetValue } from 'react-hook-form';
-import { Source } from '@prisma/client';
-import { SourceWithRelations } from '../../db';
 import { SelectableOption } from '../components/common/SearchSelect';
+import { SourceWithRelations } from '../../db';
+import { Relatable, CreateSourceFormData } from './types';
 
-export interface CreateSourceFormData {
-  title: string;
-  href: string;
-  description?: string;
-  tagIds: string[];
-  authorIds: string[];
-  regionIds: string[];
-  yearType: Source['yearType'];
-  yearStart?: number;
-  yearEnd?: number;
-}
-
-const relatableToSource = (items?: {id: string, name: string}[]): SelectableOption[] => {
+// TODO: Why did I do this? Was there a reason I can't remember?
+// Can't they all just use the same set of properties?
+const relatableToSeletable = (items?: Relatable[]): SelectableOption[] => {
   if (!items) {
     return [];
   }
@@ -24,18 +18,28 @@ const relatableToSource = (items?: {id: string, name: string}[]): SelectableOpti
   return items.map(({ id, name }) => ({ value: id, label: name }));
 };
 
-export const useCreateSourceControls = (
-  formUpdater: UseFormSetValue<CreateSourceFormData>,
+const selectableToRelatable = (items?: SelectableOption[]): Relatable[] => {
+  if (!items) {
+    return [];
+  }
+
+  return items.map(({ label, value }) => ({ id: value, name: label }));
+};
+
+export const useRelatableControls = (
+  setValue: UseFormSetValue<CreateSourceFormData>,
   sourceToEdit?: SourceWithRelations,
 ) => {
+  const [areRelatablesDirty, setAreRelateablesDirty] = useState<boolean>(false);
+
   const [tags, setTags] = useState<SelectableOption[]>(
-    relatableToSource(sourceToEdit?.tags),
+    relatableToSeletable(sourceToEdit?.tags),
   );
   const [authors, setAuthors] = useState<SelectableOption[]>(
-    relatableToSource(sourceToEdit?.authors),
+    relatableToSeletable(sourceToEdit?.authors),
   );
   const [regions, setRegions] = useState<SelectableOption[]>(
-    relatableToSource(sourceToEdit?.regions),
+    relatableToSeletable(sourceToEdit?.regions),
   );
 
   const [hasYears, setHasYears] = useState(sourceToEdit?.yearType !== 'NONE' ?? true);
@@ -43,61 +47,79 @@ export const useCreateSourceControls = (
 
   const onTagSelect = useCallback((tag: SelectableOption) => {
     setTags((currentTags) => [...currentTags, tag]);
+    setAreRelateablesDirty(true);
   }, []);
 
   const onAuthorSelect = useCallback((author: SelectableOption) => {
     setAuthors((currentAuthors) => [...currentAuthors, author]);
+    setAreRelateablesDirty(true);
   }, []);
 
   const onRegionSelect = useCallback((region: SelectableOption) => {
     setRegions((currentRegions) => [...currentRegions, region]);
+    setAreRelateablesDirty(true);
   }, []);
 
   const removeTag = useCallback((id: string) => {
     setTags((currentTags) => currentTags.filter(({ value }) => value !== id));
+    setAreRelateablesDirty(true);
   }, []);
 
   const removeAuthor = useCallback((id: string) => {
     setAuthors((currentAuthors) => currentAuthors.filter(({ value }) => value !== id));
+    setAreRelateablesDirty(true);
   }, []);
 
   const removeRegion = useCallback((id: string) => {
     setRegions((currentRegions) => currentRegions.filter(({ value }) => value !== id));
+    setAreRelateablesDirty(true);
   }, []);
 
   const toggleHasYears = useCallback(() => {
     setHasYears((currentHasYears) => !currentHasYears);
+    setAreRelateablesDirty(true);
   }, []);
 
   const toggleHasRange = useCallback(() => {
     setHasRange((currentHasRange) => !currentHasRange);
+    setAreRelateablesDirty(true);
+  }, []);
+
+  const resetRelatables = useCallback(() => {
+    setAreRelateablesDirty(false);
+    setRegions([]);
+    setTags([]);
+    setAuthors([]);
   }, []);
 
   useEffect(() => {
     const tagIds = tags.map(({ value }) => value);
-    formUpdater('tagIds', tagIds);
-  }, [tags, formUpdater]);
+    setValue('tagIds', tagIds);
+    setValue('tags', selectableToRelatable(tags));
+  }, [tags, setValue]);
 
   useEffect(() => {
     const authorIds = authors.map(({ value }) => value);
-    formUpdater('authorIds', authorIds);
-  }, [authors, formUpdater]);
+    setValue('authorIds', authorIds);
+    setValue('authors', selectableToRelatable(authors));
+  }, [authors, setValue]);
 
   useEffect(() => {
     const regionIds = regions.map(({ value }) => value);
-    formUpdater('regionIds', regionIds);
-  }, [regions, formUpdater]);
+    setValue('regionIds', regionIds);
+    setValue('regions', selectableToRelatable(regions));
+  }, [regions, setValue]);
 
   useEffect(() => {
     if (!hasYears) {
-      formUpdater('yearType', 'NONE');
+      setValue('yearType', 'NONE');
     } else {
-      formUpdater(
+      setValue(
         'yearType',
         hasRange ? 'RANGE' : 'POINT',
       );
     }
-  }, [hasYears, hasRange, formUpdater]);
+  }, [hasYears, hasRange, setValue]);
 
   return {
     tags,
@@ -113,5 +135,7 @@ export const useCreateSourceControls = (
     toggleHasYears,
     hasRange,
     toggleHasRange,
+    areRelatablesDirty,
+    resetRelatables,
   };
 };

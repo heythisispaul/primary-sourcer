@@ -117,18 +117,19 @@ export const CreateSourceButton: FunctionComponent<{ children: ReactNode }> = ({
                   type="submit"
                   colorScheme="orange"
                   isLoading={isLoading}
+                  p="20px"
                 >
                   {sourceToEdit ? 'Update' : 'Create'}
                 </Button>
               </ButtonGroup>
-              {
-                isError && (
-                  <Text fontSize=".8em" color="red">
-                    There was an error creating this source
-                  </Text>
-                )
-              }
             </DrawerFooter>
+            {
+              isError && (
+                <Text fontSize=".8em" color="red">
+                  There was an error creating this source
+                </Text>
+              )
+            }
           </CreateSourceForm>
         </DrawerContent>
       </Drawer>

@@ -28,3 +28,13 @@ export const getThisYear = () => {
 };
 
 export const thisYear = getThisYear();
+
+export const getQueryString = () => {
+  if (typeof window !== 'undefined') {
+    const queryString = window.location.href?.split('?')[1] ?? '';
+    const parsed = new URLSearchParams(queryString);
+    return parsed;
+  }
+
+  return new URLSearchParams();
+};

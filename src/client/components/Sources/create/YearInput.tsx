@@ -14,19 +14,23 @@ export interface YearInputProps {
   onChange: (value: number) => void;
 }
 
-export type Era = 'AD' | 'BC';
+export type Era = 'CE' | 'BCE';
 
 export const YearInput: FunctionComponent<YearInputProps> = ({
   initialValue,
   onChange,
 }) => {
-  const initialEra: Era = initialValue < 0 ? 'BC' : 'AD';
+  const initialEra: Era = initialValue < 0 ? 'BCE' : 'CE';
   const [era, setEra] = useState<Era | string>(initialEra);
-  const [yearValue, setYearValue] = useState<number>(Math.abs(initialValue));
+  const [yearValue, setYearValue] = useState<number | undefined>(
+    initialValue ? Math.abs(initialValue) : undefined,
+  );
 
   useEffect(() => {
-    const coEfficient = era === 'AD' ? 1 : -1;
-    onChange(yearValue * coEfficient);
+    const coEfficient = era === 'CE' ? 1 : -1;
+    if (yearValue) {
+      onChange(yearValue * coEfficient);
+    }
   }, [yearValue, era]);
 
   return (
@@ -35,13 +39,13 @@ export const YearInput: FunctionComponent<YearInputProps> = ({
         precision={0}
         value={yearValue}
         onChange={(_, numValue) => setYearValue(numValue)}
-        max={era === 'AD' ? thisYear : 10000}
+        max={era === 'CE' ? thisYear : 100000}
         min={1}
       />
       <RadioGroup onChange={setEra} value={era} colorScheme="orange">
         <Stack direction="row">
-          <Radio value="BC">BC</Radio>
-          <Radio value="AD">AD</Radio>
+          <Radio value="BCE">BCE</Radio>
+          <Radio value="CE">CE</Radio>
         </Stack>
       </RadioGroup>
     </Flex>

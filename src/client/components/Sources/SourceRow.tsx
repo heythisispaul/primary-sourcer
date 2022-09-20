@@ -58,7 +58,7 @@ export const SourceRow: FunctionComponent<SourceRowProps> = ({
   }, [session, createdBy]);
 
   const timeFrameDisplay = useMemo(() => {
-    const eraDisplay = (year: number | null) => `${Math.abs(year ?? 1)} ${(year ?? 1) > 0 ? 'AD' : 'BC'}`;
+    const eraDisplay = (year: number | null) => `${Math.abs(year ?? 1)} ${(year ?? 1) > 0 ? 'CE' : 'BCE'}`;
     if (yearType === 'NONE') {
       return null;
     }
@@ -115,13 +115,13 @@ export const SourceRow: FunctionComponent<SourceRowProps> = ({
         />
       </Flex>
       {!isDesktop && sourceAndAuthors}
-      <TagContainer
-        items={regions}
-        onDelete={() => {}}
-        isEditing={false}
-        tagProps={{ colorScheme: 'red' }}
-      />
       <Collapse in={isExpanded}>
+        <TagContainer
+          items={regions}
+          onDelete={() => {}}
+          isEditing={false}
+          tagProps={{ colorScheme: 'red' }}
+        />
         <TagContainer
           items={tags}
           onDelete={() => {}}

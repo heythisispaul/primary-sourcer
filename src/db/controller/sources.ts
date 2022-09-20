@@ -7,6 +7,10 @@ import {
   SourceWithRelations,
 } from '../types';
 
+const getClause = (isInclusive: boolean) => (isInclusive
+  ? 'hasEvery'
+  : 'hasSome');
+
 export const sourceController = () => ({
   async create(data: CreateInput<Source>) {
     const newSource = await client.source.create({ data });
@@ -43,21 +47,34 @@ export const sourceController = () => ({
 
   async getPage({
     offset = 0,
-    searchTerm = '',
-    tags = [],
-    authors = [],
+    title = '',
+    tagIds = [],
+    tagsInclusive,
+    authorIds = [],
+    authorsInclusive,
+    regionIds = [],
+    regionsInclusive,
     sortKey = SortKey.CREATED,
   }: SourceSearchParameters) {
-    const tagFilter = tags.length ? { tagIds: { hasSome: tags } } : {};
-    const authorFilter = authors.length ? { authorIds: { hasSome: authors } } : {};
+    const tagFilter = tagIds.length ? {
+      tagIds: { [getClause(tagsInclusive)]: tagIds },
+    } : {};
+    const authorFilter = authorIds.length ? {
+      authorIds: { [getClause(authorsInclusive)]: authorIds },
+    } : {};
+    const regionsFilter = regionIds.length ? {
+      regionIds: { [getClause(regionsInclusive)]: regionIds },
+    } : {};
+
     const TAKE = 25;
     const searchResults = await client.source.findMany({
       take: TAKE,
       skip: TAKE * offset,
       where: {
-        title: { contains: searchTerm },
+        title: { contains: title, mode: 'insensitive' },
         ...tagFilter,
         ...authorFilter,
+        ...regionsFilter,
       },
       include: {
         authors: {

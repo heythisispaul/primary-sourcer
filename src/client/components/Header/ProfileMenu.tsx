@@ -35,6 +35,11 @@ export const ProfileMenu: FC<ProfileMenuProps> = ({ session: { profile, user } }
           </MenuItem>
         </Link>
         <MenuDivider />
+        <Link href="/create-profile?edit=true">
+          <MenuItem disabled>
+            Edit Username
+          </MenuItem>
+        </Link>
         <MenuItem onClick={() => signOut()}>
           Log out
         </MenuItem>

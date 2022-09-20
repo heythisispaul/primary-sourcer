@@ -3,7 +3,7 @@ import { FunctionComponent, useState, useMemo } from 'react';
 import { CreatableSelect, Select } from 'chakra-react-select';
 import { useDebounce } from 'use-debounce';
 import { useQuery, useMutation } from 'react-query';
-import { Tag, Author } from '@prisma/client';
+import { Tag, Author, Region } from '@prisma/client';
 
 export interface SelectableOption {
   value: string;
@@ -16,6 +16,7 @@ export interface MultiSelectInputProps {
   onSelect: (option: SelectableOption) => void;
   allowCreate?: boolean;
   preSelected?: SelectableOption[];
+  max?: number;
 }
 
 const RelatableToSelectable = (
@@ -36,6 +37,7 @@ export const SearchSelect: FunctionComponent<MultiSelectInputProps> = ({
   allowCreate,
   onSelect,
   preSelected = [],
+  max = 6,
 }) => {
   const [input, setInput] = useState('');
   const [debouncedInput] = useDebounce(input, 500);
@@ -55,7 +57,7 @@ export const SearchSelect: FunctionComponent<MultiSelectInputProps> = ({
   const {
     mutate,
     isLoading: isMutating,
-  } = useMutation<Tag | Author, Error, string>(async (name) => {
+  } = useMutation<Tag | Author | Region, Error, string>(async (name) => {
     const result = await fetch(path, {
       method: 'POST',
       body: JSON.stringify({ name }),
@@ -82,8 +84,9 @@ export const SearchSelect: FunctionComponent<MultiSelectInputProps> = ({
       onInputChange={(value) => setInput(value.trim())}
       isLoading={isSearching || isMutating}
       value={input}
-      onCreateOption={(name) => mutate(name)}
+      onCreateOption={mutate}
       onChange={(selected: unknown) => onSelect(selected as SelectableOption)}
+      isDisabled={preSelected && preSelected.length >= max}
     />
   );
 };
