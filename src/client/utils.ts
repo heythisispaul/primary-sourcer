@@ -1,3 +1,5 @@
+import { SearchSourceFormData } from './hooks';
+
 const dateFormatter = new Intl.DateTimeFormat('en-us');
 const SAFE_HOSTS = [
   'www.wikipedia.org',
@@ -37,4 +39,18 @@ export const getQueryString = () => {
   }
 
   return new URLSearchParams();
+};
+
+export const DEFAULT_SEARCH_DATA: SearchSourceFormData = {
+  authorsInclusive: true,
+  tagsInclusive: true,
+  regionsInclusive: true,
+  title: '',
+  tagIds: [],
+  tags: [],
+  authorIds: [],
+  authors: [],
+  regionIds: [],
+  regions: [],
+  yearType: 'POINT',
 };

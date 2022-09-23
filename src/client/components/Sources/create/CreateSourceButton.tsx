@@ -22,7 +22,7 @@ import {
   IconButton,
 } from '@chakra-ui/react';
 import { AddIcon } from '@chakra-ui/icons';
-import { useMutation, useQueryClient } from 'react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSession } from 'next-auth/react';
 import { Source } from '@prisma/client';
 import { CreateSourceForm } from './CreateSourceForm';
@@ -53,7 +53,7 @@ export const CreateSourceButton: FunctionComponent<{ children: ReactNode }> = ({
   } = useMutation<Source, Error, CreateSourceFormData>(fetchClient, {
     onSuccess: () => {
       onClose();
-      queryClient.invalidateQueries('sources');
+      queryClient.invalidateQueries(['sources']);
     },
   });
 

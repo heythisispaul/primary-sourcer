@@ -1,4 +1,5 @@
-import { useQuery } from 'react-query';
+import { useEffect, useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Session } from 'next-auth';
 import { getLayout } from '../client/components/layouts/Standard';
 import { NextPageWithLayout } from './_app';
@@ -7,8 +8,8 @@ import { SourceResults } from '../client/components/Sources';
 import { serversidePropsWrapper } from '../middleware';
 import { parseBase64ToObject } from '../utils';
 import { SourceWithRelations } from '../db';
-import { useFetchClient, useUrlParamsUpdate } from '../client/hooks';
-import { safelyParseJson } from '../client/utils';
+import { safelyParseJson, DEFAULT_SEARCH_DATA } from '../client/utils';
+import { SearchSourceFormData } from '../client/hooks';
 
 export interface HomeProps {
   stringifiedSources?: string;
@@ -21,31 +22,47 @@ export const getServerSideProps = serversidePropsWrapper(async ({
   controller,
   session,
 }) => {
-  const searchOpts = context.query as any;
-  const sources = await controller.sources.getPage(parseBase64ToObject(searchOpts.search) ?? {});
+  const sourceSearchOptions = context.query?.search as string;
+  const sources = await controller.sources.getPage(parseBase64ToObject(sourceSearchOptions) ?? {});
   return { props: { stringifiedSources: JSON.stringify(sources), session } };
 });
 
 const Home: NextPageWithLayout<HomeProps> = ({
   stringifiedSources = '[]',
 }) => {
-  const [queryString] = useUrlParamsUpdate('search');
-  const sourceQueryKey = ['sources', queryString];
-  const sources = safelyParseJson<SourceWithRelations[]>(stringifiedSources);
+  const [sourceSearchData, setSourceSearchData] = useState<SearchSourceFormData>(
+    DEFAULT_SEARCH_DATA,
+  );
+  const sourceQueryKey = ['sources', sourceSearchData];
+  const queryClient = useQueryClient();
 
-  console.log(sourceQueryKey);
+  // Populate the cache with the SSR'd data:
+  useEffect(() => {
+    const sources = safelyParseJson<SourceWithRelations[]>(stringifiedSources);
+    queryClient.setQueryData(['sources', DEFAULT_SEARCH_DATA], sources);
+  }, [queryClient, stringifiedSources]);
 
-  const fetchClient = useFetchClient<SourceWithRelations[]>(`/api/sources?filter=${queryString}`);
   const {
     data,
     isFetching,
-  } = useQuery(sourceQueryKey, fetchClient, { initialData: sources, staleTime: 180 });
-
-  console.log(isFetching);
+  } = useQuery(
+    sourceQueryKey,
+    async () => {
+      const dataString = Buffer.from(JSON.stringify(sourceSearchData)).toString('base64');
+      const response = await fetch(`/api/sources?filter=${dataString}`);
+      const sourceData = await response.json();
+      return sourceData as SourceWithRelations[];
+    },
+    { staleTime: 60000 },
+  );
 
   return (
     <CreateSourceButton>
-      <SourceResults sources={data ?? undefined} isFetching={isFetching} />
+      <SourceResults
+        sources={data}
+        isFetching={isFetching}
+        setSourceSearchData={setSourceSearchData}
+      />
     </CreateSourceButton>
   );
 };

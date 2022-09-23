@@ -10,7 +10,9 @@ export const useUrlParamsUpdate = (paramKey: string) => {
     } else {
       delete router.query[paramKey];
     }
-    router.push(router, undefined, { shallow: true });
+
+    const params = new URLSearchParams(router.query as any);
+    router.push(`${router.pathname}?${params.toString()}`, undefined, { shallow: true });
   }, [router, paramKey]);
 
   return [router.query[paramKey] as string, setQueryStringKeyValue] as const;

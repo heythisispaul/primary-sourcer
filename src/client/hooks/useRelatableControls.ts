@@ -6,7 +6,7 @@ import {
 import { UseFormSetValue } from 'react-hook-form';
 import { SelectableOption } from '../components/common/SearchSelect';
 import { SourceWithRelations } from '../../db';
-import { Relatable, CreateSourceFormData } from './types';
+import { Relatable, CreateSourceFormData, SearchSourceFormData } from './types';
 
 // TODO: Why did I do this? Was there a reason I can't remember?
 // Can't they all just use the same set of properties?
@@ -27,7 +27,7 @@ const selectableToRelatable = (items?: SelectableOption[]): Relatable[] => {
 };
 
 export const useRelatableControls = (
-  setValue: UseFormSetValue<CreateSourceFormData>,
+  setValue: UseFormSetValue<CreateSourceFormData | SearchSourceFormData>,
   sourceToEdit?: SourceWithRelations,
 ) => {
   const [areRelatablesDirty, setAreRelateablesDirty] = useState<boolean>(false);

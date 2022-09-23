@@ -30,7 +30,6 @@ export interface SourceSearchParameters {
   authorsInclusive: boolean;
   regionIds?: Region['id'][];
   regionsInclusive: boolean;
-  yearType?: Source['yearType'];
   yearStart?: number;
   yearEnd?: number;
   sortKey?: SortKey;

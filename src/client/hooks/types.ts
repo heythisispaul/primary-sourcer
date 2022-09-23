@@ -23,7 +23,7 @@ export type CreateSourceFormData = SourceFormData & {
   regionIds: string[];
 }
 
-export type SearchSourceFormData = Omit<CreateSourceFormData, 'description' | 'href'> & {
+export type SearchSourceFormData = Omit<CreateSourceFormData, 'description' | 'href' | 'yearType'> & {
   tagsInclusive?: boolean;
   authorsInclusive?: boolean;
   regionsInclusive?: boolean;

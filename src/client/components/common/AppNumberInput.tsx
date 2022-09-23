@@ -9,11 +9,11 @@ import {
 } from '@chakra-ui/react';
 
 export const AppNumberInput: FunctionComponent<NumberInputProps> = (
-  props,
+  { id, ...props },
 ) => (
   // eslint-disable-next-line react/jsx-props-no-spreading
   <NumberInput {...props}>
-    <NumberInputField />
+    <NumberInputField id={id} />
     <NumberInputStepper>
       <NumberIncrementStepper />
       <NumberDecrementStepper />

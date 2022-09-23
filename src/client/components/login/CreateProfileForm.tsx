@@ -11,7 +11,7 @@ import { Session } from 'next-auth';
 import { useRouter } from 'next/router';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { useMutation } from 'react-query';
+import { useMutation } from '@tanstack/react-query';
 import { signOut } from 'next-auth/react';
 import { User } from '@prisma/client';
 import { useFetchClient } from '../../hooks';

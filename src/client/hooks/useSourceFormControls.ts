@@ -14,6 +14,7 @@ export const useSourceFormControls = (
     setValue,
     watch,
     formState,
+    getValues,
   } = useForm<CreateSourceFormData & SearchSourceFormData>({
     resolver: yupResolver(Validators.sourceCreate),
     defaultValues: {
@@ -24,7 +25,7 @@ export const useSourceFormControls = (
     },
   });
 
-  const relatableControls = useRelatableControls(setValue, sourceToEdit);
+  const relatableControls = useRelatableControls(setValue as any, sourceToEdit);
 
   return {
     ...relatableControls,
@@ -33,5 +34,6 @@ export const useSourceFormControls = (
     watch,
     setValue,
     formState,
+    getValues,
   } as const;
 };

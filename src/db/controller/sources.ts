@@ -55,6 +55,8 @@ export const sourceController = () => ({
     regionIds = [],
     regionsInclusive,
     sortKey = SortKey.CREATED,
+    yearStart,
+    yearEnd,
   }: SourceSearchParameters) {
     const tagFilter = tagIds.length ? {
       tagIds: { [getClause(tagsInclusive)]: tagIds },
@@ -75,6 +77,8 @@ export const sourceController = () => ({
         ...tagFilter,
         ...authorFilter,
         ...regionsFilter,
+        ...(yearStart ? { yearStart: { gte: yearStart } } : {}),
+        ...(yearEnd ? { yearEnd: { lte: yearEnd } } : {}),
       },
       include: {
         authors: {

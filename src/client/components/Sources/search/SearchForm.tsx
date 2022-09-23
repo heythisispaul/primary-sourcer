@@ -3,28 +3,26 @@ import { FunctionComponent, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDebouncedCallback } from 'use-debounce';
 import {
+  Button,
   Flex,
   Input,
 } from '@chakra-ui/react';
 import {
-  useUrlParamsUpdate,
   useRelatableControls,
   SearchSourceFormData,
 } from '../../../hooks';
 import { AppFormControl } from '../../common/AppFormControl';
-import { parseBase64ToObject } from '../../../../utils';
+import { DEFAULT_SEARCH_DATA } from '../../../utils';
 import { SearchSelect } from '../../common/SearchSelect';
 import { TagContainer } from '../../common/TagContainer';
 import { YearInput } from '../create/YearInput';
 
-export const SearchForm: FunctionComponent = () => {
-  const [searchString, setSearchString] = useUrlParamsUpdate('search');
-  const parsedSearchValues = parseBase64ToObject(searchString);
-  const setDefaults = {
-    authorsInclusive: parsedSearchValues?.authorsInclusive ?? true,
-    tagsInclusive: parsedSearchValues?.tagsInclusive ?? true,
-    regionsInclusive: parsedSearchValues?.regionsInclusive ?? true,
-  };
+export type SearchFormProps = {
+  // eslint-disable-next-line no-unused-vars
+  onSearch: (data: SearchSourceFormData) => void;
+}
+
+export const SearchForm: FunctionComponent<SearchFormProps> = ({ onSearch }) => {
   const {
     setValue,
     handleSubmit,
@@ -34,10 +32,7 @@ export const SearchForm: FunctionComponent = () => {
     reset,
     formState: { errors, isDirty },
   } = useForm<SearchSourceFormData>({
-    defaultValues: {
-      ...parsedSearchValues,
-      ...setDefaults,
-    },
+    defaultValues: DEFAULT_SEARCH_DATA,
   });
 
   const {
@@ -52,25 +47,28 @@ export const SearchForm: FunctionComponent = () => {
     removeTag,
     resetRelatables,
     areRelatablesDirty,
-  } = useRelatableControls(setValue as any, parsedSearchValues);
+  } = useRelatableControls(setValue);
 
   const submitHandler = handleSubmit((data: SearchSourceFormData) => {
-    if (isDirty) {
-      const submitBuffer = Buffer.from(JSON.stringify(data));
-      setSearchString(submitBuffer.toString('base64'));
+    if (isDirty || areRelatablesDirty) {
+      onSearch(data);
     }
   });
 
   const handleReset = () => {
     resetRelatables();
-    reset(undefined, { keepDirty: false });
-    setSearchString(null);
+    reset({ ...DEFAULT_SEARCH_DATA }, { keepDirty: false });
+    onSearch(DEFAULT_SEARCH_DATA);
   };
 
   const { onChange: titleOnChange, ...titleProps } = register('title');
 
   const debouncedTitleOnChange = useDebouncedCallback(titleOnChange, 500);
+  // const debouncedSetMinYear = useDebouncedCallback((value) => setValue('yearStart', value), 500);
+  // const debouncedSetMaxYear = useDebouncedCallback((value) => setValue('yearEnd', value), 500);
 
+  // Basically, when any of these values change,
+  // submit the form
   const {
     title,
     authorIds,
@@ -85,12 +83,7 @@ export const SearchForm: FunctionComponent = () => {
   } = watch();
 
   useEffect(() => {
-    console.log('firing');
-    const values = getValues();
-    if (isDirty || areRelatablesDirty) {
-      const submitBuffer = Buffer.from(JSON.stringify(values));
-      setSearchString(submitBuffer.toString('base64'));
-    }
+    onSearch(getValues());
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     title,
@@ -185,24 +178,27 @@ export const SearchForm: FunctionComponent = () => {
           includeAll={watch('tagsInclusive')}
         />
         <AppFormControl
-          label="Year (from)"
+          label="Year (Min)"
           errorMessage={errors?.yearStart?.message}
         >
-          <YearInput
-            onChange={(value) => setValue('yearStart', value)}
-            initialValue={getValues('yearStart') as any}
-          />
+          <YearInput onChange={(value) => setValue('yearStart', value)} initialValue={watch('yearStart') as any} />
         </AppFormControl>
         <AppFormControl
-          label="Year (To)"
-          errorMessage={errors?.yearStart?.message}
+          label="Year (Max)"
+          errorMessage={errors?.yearEnd?.message}
         >
-          <YearInput
-            onChange={(value) => setValue('yearEnd', value)}
-            initialValue={getValues('yearEnd') as any}
-          />
+          <YearInput onChange={(value) => setValue('yearEnd', value)} initialValue={watch('yearEnd') as any} />
         </AppFormControl>
-        <button type="button" onClick={handleReset}>reset</button>
+        <Flex justifyContent="flex-end">
+          <Button
+            type="button"
+            onClick={handleReset}
+            mt={2}
+            colorScheme="orange"
+          >
+            Reset
+          </Button>
+        </Flex>
       </form>
     </Flex>
   );

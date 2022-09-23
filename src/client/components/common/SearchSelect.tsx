@@ -2,7 +2,7 @@
 import { FunctionComponent, useState, useMemo } from 'react';
 import { CreatableSelect, Select } from 'chakra-react-select';
 import { useDebounce } from 'use-debounce';
-import { useQuery, useMutation } from 'react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { Tag, Author, Region } from '@prisma/client';
 
 export interface SelectableOption {

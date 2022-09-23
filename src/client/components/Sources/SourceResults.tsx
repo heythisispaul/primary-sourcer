@@ -14,9 +14,15 @@ import { SourceWithRelations } from '../../../db';
 export interface SourceResultProps {
   sources?: SourceWithRelations[];
   isFetching: boolean;
+  // eslint-disable-next-line no-unused-vars
+  setSourceSearchData: (stuff: any) => void;
 }
 
-export const SourceResults: FunctionComponent<SourceResultProps> = ({ sources, isFetching }) => {
+export const SourceResults: FunctionComponent<SourceResultProps> = ({
+  sources,
+  isFetching,
+  setSourceSearchData,
+}) => {
   const [activeId, setActiveId] = useState<string>('');
   const { current: setIdCallback } = useRef((id: string) => setActiveId(id));
 
@@ -63,7 +69,7 @@ export const SourceResults: FunctionComponent<SourceResultProps> = ({ sources, i
 
   return (
     <Flex w="100%" gap={2}>
-      <SearchForm />
+      <SearchForm onSearch={setSourceSearchData} />
       {content}
     </Flex>
   );

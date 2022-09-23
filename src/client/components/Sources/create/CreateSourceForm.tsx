@@ -50,8 +50,25 @@ export const CreateSourceForm: FunctionComponent<CreateSourceFormProps> = ({
     formState: { errors },
   } = useSourceFormControls(sourceToEdit);
 
+  const handleYearsOnSubmit = (data: CreateSourceFormData) => {
+    switch (data.yearType) {
+      case 'NONE':
+        return { yearStart: null, yearEnd: null };
+      case 'POINT':
+        return { yearEnd: data.yearStart };
+      default:
+        return {};
+    }
+  };
+
+  const massageAndSubmit = (data: CreateSourceFormData) => {
+    const updatedYearData = handleYearsOnSubmit(data);
+    const massagedSubmitData = { ...data, ...updatedYearData };
+    onSubmit(massagedSubmitData);
+  };
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit(massageAndSubmit)}>
       <Flex flexDirection="column">
         <AppFormControl
           label="Title"
