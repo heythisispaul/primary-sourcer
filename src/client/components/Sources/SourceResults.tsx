@@ -67,7 +67,7 @@ export const SourceResults: FunctionComponent<SourceResultProps> = ({
     // might be cool to use some skeletons isntead of a spinner
     return (
       <Flex flexDirection="column" alignItems="center" flexGrow={1} gap={2}>
-        {sources.map((source) => (
+        {sources && sources.map((source) => (
           <SourceRow
             key={source.id}
             activeId={activeId}

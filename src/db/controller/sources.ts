@@ -63,8 +63,6 @@ export const sourceController = () => ({
     }: SourceSearchParameters,
     currentUser?: string,
   ) {
-    console.log(currentUser);
-    console.log(meOnly);
     const tagFilter = tagIds.length ? {
       tagIds: { [getClause(tagsInclusive)]: tagIds },
     } : {};

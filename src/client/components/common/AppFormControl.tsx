@@ -43,7 +43,7 @@ export const AppFormControl: FunctionComponent<AppFormControlProps & FormControl
     // eslint-disable-next-line react/jsx-props-no-spreading
     <FormControl {...rest} isInvalid={Boolean(errorMessage)}>
       <FormLabel>
-        {toRender.map((item) => item)}
+        {toRender?.map((item) => item)}
       </FormLabel>
       {detailText}
     </FormControl>
