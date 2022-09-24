@@ -20,7 +20,7 @@ export interface MultiSelectInputProps {
 }
 
 const RelatableToSelectable = (
-  entities: Tag[] | Author[],
+  entities: Tag[] | Author[] = [],
   selected: SelectableOption[] = [],
 ) => entities.map(({ name, id }): SelectableOption => {
   const isDisabled = selected.some(({ value: selectedId }) => id === selectedId);
@@ -54,6 +54,8 @@ export const SearchSelect: FunctionComponent<MultiSelectInputProps> = ({
     return data;
   });
 
+  console.log(fetchedOptions);
+
   const {
     mutate,
     isLoading: isMutating,
@@ -72,7 +74,12 @@ export const SearchSelect: FunctionComponent<MultiSelectInputProps> = ({
   });
 
   const options = useMemo(
-    () => RelatableToSelectable(fetchedOptions ?? [], preSelected),
+    () => {
+      if (fetchedOptions?.error) {
+        return [];
+      }
+      return RelatableToSelectable(fetchedOptions ?? [], preSelected)
+    },
     [fetchedOptions, preSelected],
   );
 
