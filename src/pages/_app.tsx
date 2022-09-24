@@ -8,6 +8,7 @@ import type { AppProps } from 'next/app';
 import { SessionProvider } from 'next-auth/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import theme from '../client/theme';
+import ErrorBoundary from '../client/components/layouts/ErrorBoundary';
 
 export type NextPageWithLayout<T = any> = NextPage<T> & {
   // eslint-disable-next-line no-unused-vars
@@ -23,14 +24,16 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const getLayout = Component.getLayout ?? ((page) => page);
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <ChakraProvider theme={theme}>
-        <SessionProvider session={pageProps.session}>
-          {getLayout(<Component {...pageProps} />)}
-        </SessionProvider>
-      </ChakraProvider>
-      <ReactQueryDevtools initialIsOpen={false} />
-    </QueryClientProvider>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <ChakraProvider theme={theme}>
+          <SessionProvider session={pageProps.session}>
+            {getLayout(<Component {...pageProps} />)}
+          </SessionProvider>
+        </ChakraProvider>
+        <ReactQueryDevtools initialIsOpen={false} />
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 }
 
