@@ -12,6 +12,7 @@ export interface AppFormControlProps {
   label: string;
   helperText?: string;
   errorMessage?: string;
+  controlFirst?: boolean;
 }
 
 export const AppFormControl: FunctionComponent<AppFormControlProps & FormControlProps> = ({
@@ -19,6 +20,7 @@ export const AppFormControl: FunctionComponent<AppFormControlProps & FormControl
   label,
   helperText,
   errorMessage,
+  controlFirst,
   ...rest
 }) => {
   const detailText = useMemo(() => {
@@ -33,12 +35,15 @@ export const AppFormControl: FunctionComponent<AppFormControlProps & FormControl
     return null;
   }, [helperText, errorMessage]);
 
+  const content = [label, children];
+
+  const toRender = controlFirst ? content.reverse() : content;
+
   return (
     // eslint-disable-next-line react/jsx-props-no-spreading
     <FormControl {...rest} isInvalid={Boolean(errorMessage)}>
       <FormLabel>
-        {label}
-        {children}
+        {toRender.map((item) => item)}
       </FormLabel>
       {detailText}
     </FormControl>

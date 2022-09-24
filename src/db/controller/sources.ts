@@ -6,6 +6,7 @@ import {
   SortKey,
   SourceWithRelations,
 } from '../types';
+import { PAGE_TAKE } from '../../utils';
 
 const getClause = (isInclusive: boolean) => (isInclusive
   ? 'hasEvery'
@@ -45,19 +46,25 @@ export const sourceController = () => ({
     return updatedSource;
   },
 
-  async getPage({
-    offset = 0,
-    title = '',
-    tagIds = [],
-    tagsInclusive,
-    authorIds = [],
-    authorsInclusive,
-    regionIds = [],
-    regionsInclusive,
-    sortKey = SortKey.CREATED,
-    yearStart,
-    yearEnd,
-  }: SourceSearchParameters) {
+  async getPage(
+    {
+      offset = 0,
+      title = '',
+      tagIds = [],
+      tagsInclusive,
+      authorIds = [],
+      authorsInclusive,
+      regionIds = [],
+      regionsInclusive,
+      sortKey = SortKey.CREATED,
+      yearStart,
+      yearEnd,
+      meOnly,
+    }: SourceSearchParameters,
+    currentUser?: string,
+  ) {
+    console.log(currentUser);
+    console.log(meOnly);
     const tagFilter = tagIds.length ? {
       tagIds: { [getClause(tagsInclusive)]: tagIds },
     } : {};
@@ -67,11 +74,13 @@ export const sourceController = () => ({
     const regionsFilter = regionIds.length ? {
       regionIds: { [getClause(regionsInclusive)]: regionIds },
     } : {};
+    const createdByFilter = meOnly && currentUser ? {
+      createdById: currentUser,
+    } : {};
 
-    const TAKE = 25;
     const searchResults = await client.source.findMany({
-      take: TAKE,
-      skip: TAKE * offset,
+      take: PAGE_TAKE,
+      skip: PAGE_TAKE * offset,
       where: {
         title: { contains: title, mode: 'insensitive' },
         ...tagFilter,
@@ -79,6 +88,7 @@ export const sourceController = () => ({
         ...regionsFilter,
         ...(yearStart ? { yearStart: { gte: yearStart } } : {}),
         ...(yearEnd ? { yearEnd: { lte: yearEnd } } : {}),
+        ...createdByFilter,
       },
       include: {
         authors: {

@@ -1,4 +1,9 @@
-import { Flex, Heading, Spacer } from '@chakra-ui/react';
+import {
+  Flex,
+  Heading,
+  Spacer,
+  useMediaQuery,
+} from '@chakra-ui/react';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import LoginControls from './LoginControls';
@@ -6,9 +11,12 @@ import { ProfileMenu } from './ProfileMenu';
 
 const Container = () => {
   const { data: session } = useSession();
+  const [isDesktop] = useMediaQuery('(min-width: 800px)');
+
+  const margin = isDesktop ? 3 : 0;
 
   return (
-    <Flex bg="white" minW="max-content" alignItems="center" gap={2} boxShadow="md" as="header" p={2} mb={3} minH="68px">
+    <Flex bg="white" minW="max-content" alignItems="center" gap={2} boxShadow="md" as="header" p={2} mb={margin} minH="68px">
       <Link href="/">
         <Heading
           size="md"

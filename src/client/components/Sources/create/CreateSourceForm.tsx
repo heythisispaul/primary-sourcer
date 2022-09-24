@@ -135,14 +135,14 @@ export const CreateSourceForm: FunctionComponent<CreateSourceFormProps> = ({
             >
               <YearInput
                 onChange={(value) => setValue('yearStart', value)}
-                initialValue={watch('yearStart') ?? thisYear}
+                value={watch('yearStart') ?? thisYear}
               />
             </AppFormControl>
             <Collapse in={hasRange}>
               <AppFormControl label="Year (to)" errorMessage={errors?.yearEnd?.message}>
                 <YearInput
                   onChange={(value) => setValue('yearEnd', value)}
-                  initialValue={watch('yearEnd') ?? thisYear}
+                  value={watch('yearEnd') ?? thisYear}
                 />
               </AppFormControl>
             </Collapse>

@@ -45,6 +45,7 @@ export const DEFAULT_SEARCH_DATA: SearchSourceFormData = {
   authorsInclusive: true,
   tagsInclusive: true,
   regionsInclusive: true,
+  meOnly: false,
   title: '',
   tagIds: [],
   tags: [],
@@ -52,5 +53,5 @@ export const DEFAULT_SEARCH_DATA: SearchSourceFormData = {
   authors: [],
   regionIds: [],
   regions: [],
-  yearType: 'POINT',
+  offset: 0,
 };

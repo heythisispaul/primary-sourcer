@@ -27,9 +27,9 @@ export namespace Validators {
     tagIds: array().of(string()).min(1).max(10),
     authorIds: array().of(string()).min(1).max(10),
     yearType: string().oneOf(['NONE', 'POINT', 'RANGE']),
-    yearStart: number().min(-10000),
+    yearStart: number().min(-10000).nullable(),
     // @ts-ignore
-    yearEnd: number().when(['yearType', 'yearStart'], (yearType: string, yearStart: number, schema: NumberSchema) => {
+    yearEnd: number().nullable().when(['yearType', 'yearStart'], (yearType: string, yearStart: number, schema: NumberSchema) => {
       schema.max(2500);
       if (yearType === 'RANGE') {
         return schema.min(yearStart, 'Must be greater than year end range');

@@ -5,8 +5,10 @@ import {
   Flex,
   Link,
   useMediaQuery,
+  Skeleton,
 } from '@chakra-ui/react';
 import { useSession } from 'next-auth/react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { SourceContextMenu } from './SourceContextMenu';
 import { TagContainer } from '../common/TagContainer';
 import { SourceWithRelations } from '../../../db';
@@ -18,12 +20,14 @@ export interface SourceRowProps {
   // eslint-disable-next-line no-unused-vars
   setActiveId: (index: string) => void;
   source: SourceWithRelations;
+  expandAll: boolean;
 }
 
 export const SourceRow: FunctionComponent<SourceRowProps> = ({
   activeId,
   setActiveId,
   source,
+  expandAll,
 }) => {
   const {
     id,
@@ -40,11 +44,24 @@ export const SourceRow: FunctionComponent<SourceRowProps> = ({
     createdBy,
   } = source;
   const { data: session } = useSession();
+  const queryClient = useQueryClient();
   const { setSourceToEdit, sourceToEdit } = useEditingSourceControls();
   const isInEditMode = Boolean(sourceToEdit);
   const [isDesktop] = useMediaQuery('(min-width: 600px)');
-  const isExpanded = Boolean((activeId === id));
+  const isExpanded = (activeId === id) || expandAll;
   const { host } = toURL(href);
+
+  const fetcher = async (idToDelete: string) => {
+    const response = await fetch(`/api/sources/${idToDelete}`, { method: 'DELETE' });
+    const result = await response.json();
+    return result;
+  };
+
+  const { mutate: deleteSource, isError, isLoading } = useMutation(fetcher, {
+    onSuccess: () => {
+      queryClient.invalidateQueries(['sources']);
+    },
+  });
 
   const { isOwner, canEdit } = useMemo(() => {
     const isAdmin = session?.profile?.isAdmin;
@@ -89,7 +106,8 @@ export const SourceRow: FunctionComponent<SourceRowProps> = ({
   );
 
   return (
-    <Flex
+    <Skeleton
+      display="flex"
       onClick={() => setActiveId(isExpanded ? '' : id)}
       w="100%"
       p={2}
@@ -99,6 +117,7 @@ export const SourceRow: FunctionComponent<SourceRowProps> = ({
       flexDirection="column"
       bg="white"
       _hover={{ cursor: 'pointer' }}
+      isLoaded={!isLoading}
     >
       <Flex align="baseline" w="100%" justifyContent="space-between" p={1}>
         <Flex justifyContent="center" align="baseline" paddingBottom="0px">
@@ -110,7 +129,7 @@ export const SourceRow: FunctionComponent<SourceRowProps> = ({
         <SourceContextMenu
           isInEditMode={isInEditMode}
           onEdit={() => setSourceToEdit(source)}
-          onDelete={() => {}}
+          onDelete={() => deleteSource(source.id)}
           canEdit={canEdit}
         />
       </Flex>
@@ -135,6 +154,7 @@ export const SourceRow: FunctionComponent<SourceRowProps> = ({
           {`Created ${toUSDate(createdAt)} by ${isOwner ? 'You' : createdBy.username}`}
         </Text>
       </Collapse>
-    </Flex>
+      {isError && <Text color="red">There was an error deleting this source</Text>}
+    </Skeleton>
   );
 };

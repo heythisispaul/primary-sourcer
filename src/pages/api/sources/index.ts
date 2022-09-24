@@ -15,8 +15,8 @@ const validationWrapper = validationMiddleware({
 const sessionWrapper = withSession();
 
 const handler: SourcerNextApiHandler = async (req, res) => {
+  const createdById = req?.session?.profile?.id;
   if (req.method === 'POST') {
-    const createdById = req.session?.profile?.id;
     if (!createdById) {
       return res.status(401).json({ error: true, message: 'Missing profile Id in session' });
     }
@@ -30,6 +30,7 @@ const handler: SourcerNextApiHandler = async (req, res) => {
 
   const sources = await Controller.sources.getPage(
     parseBase64ToObject(req.query.filter as string) ?? {},
+    createdById,
   );
   return res.json(sources);
 };

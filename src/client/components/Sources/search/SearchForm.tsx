@@ -1,11 +1,18 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import { FunctionComponent, useEffect } from 'react';
+import {
+  FunctionComponent,
+  useEffect,
+  Dispatch,
+  SetStateAction,
+} from 'react';
 import { useForm } from 'react-hook-form';
 import { useDebouncedCallback } from 'use-debounce';
 import {
   Button,
+  Divider,
   Flex,
   Input,
+  Switch,
 } from '@chakra-ui/react';
 import {
   useRelatableControls,
@@ -20,9 +27,15 @@ import { YearInput } from '../create/YearInput';
 export type SearchFormProps = {
   // eslint-disable-next-line no-unused-vars
   onSearch: (data: SearchSourceFormData) => void;
+  setExpandAll: Dispatch<SetStateAction<boolean>>;
+  expandAll: boolean;
 }
 
-export const SearchForm: FunctionComponent<SearchFormProps> = ({ onSearch }) => {
+export const SearchForm: FunctionComponent<SearchFormProps> = ({
+  onSearch,
+  setExpandAll,
+  expandAll,
+}) => {
   const {
     setValue,
     handleSubmit,
@@ -63,9 +76,7 @@ export const SearchForm: FunctionComponent<SearchFormProps> = ({ onSearch }) => 
 
   const { onChange: titleOnChange, ...titleProps } = register('title');
 
-  const debouncedTitleOnChange = useDebouncedCallback(titleOnChange, 500);
-  // const debouncedSetMinYear = useDebouncedCallback((value) => setValue('yearStart', value), 500);
-  // const debouncedSetMaxYear = useDebouncedCallback((value) => setValue('yearEnd', value), 500);
+  const debouncedTitleOnChange = useDebouncedCallback(titleOnChange, 300);
 
   // Basically, when any of these values change,
   // submit the form
@@ -119,6 +130,23 @@ export const SearchForm: FunctionComponent<SearchFormProps> = ({ onSearch }) => 
             placeholder="Title"
           />
         </AppFormControl>
+        <AppFormControl label="Expand all" display="flex" alignItems="center" controlFirst>
+          <Switch
+            onChange={() => setExpandAll((current) => !current)}
+            mr={2}
+            colorScheme="orange"
+            isChecked={expandAll}
+          />
+        </AppFormControl>
+        <AppFormControl label="My contributions only" display="flex" alignItems="center" controlFirst>
+          <Switch
+            isChecked={watch('meOnly')}
+            onChange={() => setValue('meOnly', !meOnly)}
+            mr={2}
+            colorScheme="orange"
+          />
+        </AppFormControl>
+        <Divider mt={2} mb={2} />
         <AppFormControl
           label="Author(s)"
           errorMessage={errors?.authorIds && 'There was an error with your author selections'}
@@ -177,17 +205,18 @@ export const SearchForm: FunctionComponent<SearchFormProps> = ({ onSearch }) => 
           onIncludeAll={(value) => setValue('tagsInclusive', value)}
           includeAll={watch('tagsInclusive')}
         />
+        <Divider mt={2} mb={2} />
         <AppFormControl
           label="Year (Min)"
           errorMessage={errors?.yearStart?.message}
         >
-          <YearInput onChange={(value) => setValue('yearStart', value)} initialValue={watch('yearStart') as any} />
+          <YearInput onChange={(value) => setValue('yearStart', value)} value={watch('yearStart') as any} debounce={300} />
         </AppFormControl>
         <AppFormControl
           label="Year (Max)"
           errorMessage={errors?.yearEnd?.message}
         >
-          <YearInput onChange={(value) => setValue('yearEnd', value)} initialValue={watch('yearEnd') as any} />
+          <YearInput onChange={(value) => setValue('yearEnd', value)} value={watch('yearEnd') as any} debounce={300} />
         </AppFormControl>
         <Flex justifyContent="flex-end">
           <Button

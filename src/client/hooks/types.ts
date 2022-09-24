@@ -28,4 +28,5 @@ export type SearchSourceFormData = Omit<CreateSourceFormData, 'description' | 'h
   authorsInclusive?: boolean;
   regionsInclusive?: boolean;
   meOnly?: boolean;
+  offset?: number;
 }

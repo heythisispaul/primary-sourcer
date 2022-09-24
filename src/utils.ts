@@ -27,3 +27,5 @@ export const parseBase64ToObject = (base64Encoded: string | null) => {
     return null;
   }
 };
+
+export const PAGE_TAKE = 25;

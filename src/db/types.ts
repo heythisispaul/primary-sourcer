@@ -33,6 +33,7 @@ export interface SourceSearchParameters {
   yearStart?: number;
   yearEnd?: number;
   sortKey?: SortKey;
+  meOnly?: boolean;
 }
 
 export type SourceWithRelations = Source & {

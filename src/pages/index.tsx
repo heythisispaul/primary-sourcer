@@ -36,6 +36,14 @@ const Home: NextPageWithLayout<HomeProps> = ({
   const sourceQueryKey = ['sources', sourceSearchData];
   const queryClient = useQueryClient();
 
+  // TODO: fetch the next page offset on page change and store it to the cache
+  const fetchSources = async () => {
+    const dataString = Buffer.from(JSON.stringify(sourceSearchData)).toString('base64');
+    const response = await fetch(`/api/sources?filter=${dataString}`);
+    const sourceData = await response.json();
+    return sourceData as SourceWithRelations[];
+  };
+
   // Populate the cache with the SSR'd data:
   useEffect(() => {
     const sources = safelyParseJson<SourceWithRelations[]>(stringifiedSources);
@@ -47,12 +55,7 @@ const Home: NextPageWithLayout<HomeProps> = ({
     isFetching,
   } = useQuery(
     sourceQueryKey,
-    async () => {
-      const dataString = Buffer.from(JSON.stringify(sourceSearchData)).toString('base64');
-      const response = await fetch(`/api/sources?filter=${dataString}`);
-      const sourceData = await response.json();
-      return sourceData as SourceWithRelations[];
-    },
+    fetchSources,
     { staleTime: 60000 },
   );
 
@@ -62,6 +65,7 @@ const Home: NextPageWithLayout<HomeProps> = ({
         sources={data}
         isFetching={isFetching}
         setSourceSearchData={setSourceSearchData}
+        sourceSearchData={sourceSearchData}
       />
     </CreateSourceButton>
   );
