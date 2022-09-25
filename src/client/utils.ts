@@ -54,4 +54,5 @@ export const DEFAULT_SEARCH_DATA: SearchSourceFormData = {
   regionIds: [],
   regions: [],
   offset: 0,
+  yearType: 'POINT',
 };

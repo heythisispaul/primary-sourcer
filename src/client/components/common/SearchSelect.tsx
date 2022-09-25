@@ -54,8 +54,6 @@ export const SearchSelect: FunctionComponent<MultiSelectInputProps> = ({
     return data;
   });
 
-  console.log(fetchedOptions);
-
   const {
     mutate,
     isLoading: isMutating,
@@ -78,7 +76,7 @@ export const SearchSelect: FunctionComponent<MultiSelectInputProps> = ({
       if (fetchedOptions?.error) {
         return [];
       }
-      return RelatableToSelectable(fetchedOptions ?? [], preSelected)
+      return RelatableToSelectable(fetchedOptions ?? [], preSelected);
     },
     [fetchedOptions, preSelected],
   );

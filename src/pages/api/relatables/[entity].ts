@@ -11,11 +11,13 @@ const errorWrapper = errorHandlingMiddleware(['GET', 'POST', 'PATCH']);
 const validationWrapper = validationMiddleware({
   schema: Validators.relatable,
 });
-const sessionWrapper = withSession({ requireSession: true });
+const sessionWrapper = withSession();
 
 // TODO: Allow for updates
 const handler: SourcerNextApiHandler = async (req, res) => {
   const { entity } = req.query;
+  const hasSession = req?.session?.profile?.id;
+
   // TODO: Make this Controller mapping more straightforward
   // @ts-ignore
   const mappedController = Controller[`${entity}s`];
@@ -24,9 +26,14 @@ const handler: SourcerNextApiHandler = async (req, res) => {
   }
 
   if (req.method === 'POST') {
+    if (!hasSession) {
+      return res.status(401).json({ error: true });
+    }
+
     const createdRelatable = await mappedController.create(req.body);
     return res.json(createdRelatable);
   }
+
   const relatables = await mappedController.getOptions(req.query.search as string);
   return res.json(relatables);
 };

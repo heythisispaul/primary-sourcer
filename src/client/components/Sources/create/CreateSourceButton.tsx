@@ -14,6 +14,7 @@ import {
   DrawerContent,
   DrawerCloseButton,
   DrawerHeader,
+  DrawerBody,
   DrawerFooter,
   ButtonGroup,
   Text,
@@ -98,39 +99,41 @@ export const CreateSourceButton: FunctionComponent<{ children: ReactNode }> = ({
     <EditingSource.Provider value={contextValue}>
       {button}
       {children}
-      <Drawer isOpen={isOpen} onClose={onClose} size="md" onCloseComplete={() => setSourceToEdit(undefined)}>
+      <Drawer isFullHeight isOpen={isOpen} onClose={onClose} size="md" onCloseComplete={() => setSourceToEdit(undefined)}>
         <DrawerOverlay />
         <DrawerContent p={6}>
           <DrawerHeader>{sourceToEdit ? 'Edit Source' : 'New Source'}</DrawerHeader>
           <DrawerCloseButton />
-          <CreateSourceForm onSubmit={mutate} sourceToEdit={sourceToEdit}>
-            <DrawerFooter p={4}>
-              <ButtonGroup colorScheme="orange">
-                <Button
-                  onClick={onClose}
-                  variant="outline"
-                  isDisabled={isLoading}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  colorScheme="orange"
-                  isLoading={isLoading}
-                  p="20px"
-                >
-                  {sourceToEdit ? 'Update' : 'Create'}
-                </Button>
-              </ButtonGroup>
-            </DrawerFooter>
-            {
-              isError && (
-                <Text fontSize=".8em" color="red">
-                  There was an error creating this source
-                </Text>
-              )
-            }
-          </CreateSourceForm>
+          <DrawerBody>
+            <CreateSourceForm onSubmit={mutate} sourceToEdit={sourceToEdit}>
+              <DrawerFooter p={4}>
+                <ButtonGroup colorScheme="orange">
+                  <Button
+                    onClick={onClose}
+                    variant="outline"
+                    isDisabled={isLoading}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="submit"
+                    colorScheme="orange"
+                    isLoading={isLoading}
+                    p="20px"
+                  >
+                    {sourceToEdit ? 'Update' : 'Create'}
+                  </Button>
+                </ButtonGroup>
+              </DrawerFooter>
+              {
+                isError && (
+                  <Text fontSize=".8em" color="red">
+                    There was an error creating this source
+                  </Text>
+                )
+              }
+            </CreateSourceForm>
+          </DrawerBody>
         </DrawerContent>
       </Drawer>
     </EditingSource.Provider>
