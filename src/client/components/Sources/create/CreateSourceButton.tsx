@@ -101,7 +101,7 @@ export const CreateSourceButton: FunctionComponent<{ children: ReactNode }> = ({
       {children}
       <Drawer isFullHeight isOpen={isOpen} onClose={onClose} size="md" onCloseComplete={() => setSourceToEdit(undefined)}>
         <DrawerOverlay />
-        <DrawerContent p={6}>
+        <DrawerContent p={6} overflow="scroll">
           <DrawerHeader>{sourceToEdit ? 'Edit Source' : 'New Source'}</DrawerHeader>
           <DrawerCloseButton />
           <DrawerBody>
