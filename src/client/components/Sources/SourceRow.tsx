@@ -89,7 +89,6 @@ export const SourceRow: FunctionComponent<SourceRowProps> = ({
 
   const sourceAndAuthors = (
     <Flex align="baseline">
-      <Text ml={2} fontSize=".8em" color="gray.400">by</Text>
       <TagContainer
         items={authors}
         isEditing={false}
@@ -119,12 +118,14 @@ export const SourceRow: FunctionComponent<SourceRowProps> = ({
       _hover={{ cursor: 'pointer' }}
       isLoaded={!isLoading}
     >
-      <Flex align="baseline" w="100%" justifyContent="space-between" p={1}>
+      <Flex align="baseline" w="100%" justifyContent="space-between" p={1} gap={3}>
         <Flex justifyContent="center" align="baseline" paddingBottom="0px">
-          <Link isExternal href={href} fontSize="1.2em" fontWeight="bold">
-            {title}
-          </Link>
-          {isDesktop && sourceAndAuthors}
+          <span>
+            <Link isExternal href={href} fontSize="lg" fontWeight="bold">
+              {title}
+            </Link>
+            {isDesktop && sourceAndAuthors}
+          </span>
         </Flex>
         <SourceContextMenu
           isInEditMode={isInEditMode}

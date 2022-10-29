@@ -72,8 +72,20 @@ export const sourceController = () => ({
     const regionsFilter = regionIds.length ? {
       regionIds: { [getClause(regionsInclusive)]: regionIds },
     } : {};
+
     const createdByFilter = meOnly && currentUser ? {
       createdById: currentUser,
+    } : {};
+
+    const yearStartFilter = yearStart ? {
+      yearStart: { gte: yearStart },
+    } : {};
+
+    const yearEndFilter = yearEnd ? {
+      OR: [
+        { yearEnd: { lte: yearEnd } },
+        { yearStart: { lte: yearEnd } },
+      ],
     } : {};
 
     const searchResults = await client.source.findMany({
@@ -84,8 +96,8 @@ export const sourceController = () => ({
         ...tagFilter,
         ...authorFilter,
         ...regionsFilter,
-        ...(yearStart ? { yearStart: { gte: yearStart } } : {}),
-        ...(yearEnd ? { yearEnd: { lte: yearEnd } } : {}),
+        ...yearStartFilter,
+        ...yearEndFilter,
         ...createdByFilter,
       },
       include: {

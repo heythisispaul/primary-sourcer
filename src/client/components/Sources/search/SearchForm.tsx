@@ -123,7 +123,7 @@ export const SearchForm: FunctionComponent<SearchFormProps> = ({
       bg="white"
     >
       <form onSubmit={submitHandler}>
-        <AppFormControl label="Search">
+        <AppFormControl label="Search by title">
           <Input
             onChange={debouncedTitleOnChange}
             {...titleProps}
